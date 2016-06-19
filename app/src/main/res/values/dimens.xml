@@ -16,4 +16,21 @@
     <dimen name="spacing_large_56">56dp</dimen>
     <dimen name="spacing_larger_72">72dp</dimen>
 
+    <!-- Toolbar sizes -->
+    <dimen name="toolbar_height">56dp</dimen>
+
+    <!-- List sizes -->
+    <dimen name="list_title_height">72dp</dimen>
+    <dimen name="list_subtitle_height">48dp</dimen>
+    <dimen name="list_item_height">72dp</dimen>
+
+    <!-- Drawer sizes -->
+    <dimen name="drawer_menu_height">48dp</dimen>
+    <dimen name="drawer_item_height">48dp</dimen>
+
+    <!-- Avatar, icon touch target sizes -->
+    <dimen name="avatar_size">40dp</dimen>
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="touch_target_size">48dp</dimen>
+
 </resources>
