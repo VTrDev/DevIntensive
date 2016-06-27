@@ -19,6 +19,8 @@
     <dimen name="line_size">1dp</dimen>
     <dimen name="line_size_2">2dp</dimen>
 
-    <dimen name="user_info_height">104dp</dimen>
+    <dimen name="user_info_height">112dp</dimen>
+    <dimen name="profile_image_size">256dp</dimen>
+    <dimen name="fab_right_space">0dp</dimen>
 
 </resources>
