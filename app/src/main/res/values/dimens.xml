@@ -22,5 +22,6 @@
     <dimen name="user_info_height">112dp</dimen>
     <dimen name="profile_image_size">256dp</dimen>
     <dimen name="fab_right_space">0dp</dimen>
+    <dimen name="avatar_size">60dp</dimen>
 
 </resources>

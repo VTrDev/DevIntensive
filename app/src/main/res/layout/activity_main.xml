@@ -34,7 +34,7 @@
                     android:layout_height="@dimen/profile_image_size"
                     android:scaleType="centerCrop"
                     android:src="@drawable/userphoto"
-                    android:fitsSystemWindows="true"/>
+                    android:fitsSystemWindows="true" />
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
@@ -42,11 +42,13 @@
                     android:layout_height="?attr/actionBarSize"
                     android:theme="@style/AppTheme.PopupOverlay"
                     app:titleTextColor="@color/white"
-                    app:layout_collapseMode="pin" />
+                    app:layout_collapseMode="pin"/>
 
             </android.support.design.widget.CollapsingToolbarLayout>
 
         </android.support.design.widget.AppBarLayout>
+
+
 
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"

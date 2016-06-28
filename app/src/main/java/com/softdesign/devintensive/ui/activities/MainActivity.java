@@ -1,5 +1,7 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -18,6 +20,7 @@ import android.widget.ImageView;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.RoundedAvatarDrawable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +36,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
     private DrawerLayout mNavigationDrawer;
+    private NavigationView mNavigationView;
     private FloatingActionButton mFab;
     private EditText mUserPhone, mUserMail, mUserVk, mUserGit, mUserBio;
 
@@ -50,6 +54,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coordinator_container);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mNavigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
+        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mFab = (FloatingActionButton) findViewById(R.id.fab);
 
         mUserPhone = (EditText) findViewById(R.id.phone_et);
@@ -142,10 +147,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 }
 
                 break;
-            case R.id.call_img:
-//                showProgress();
-//                runWithDelay();
-                break;
         }
     }
 
@@ -153,6 +154,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(ConstantManager.EDIT_MODE_KEY, mCurrentEditMode);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mNavigationDrawer != null && mNavigationDrawer.isDrawerOpen(GravityCompat.START)) {
+            mNavigationDrawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void showShackbar(String message) {
@@ -169,16 +179,27 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void setupDrawer() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                showShackbar(item.getTitle().toString());
-                item.setChecked(true);
-                mNavigationDrawer.closeDrawer(GravityCompat.START);
-                return false;
-            }
-        });
+        if (mNavigationView != null) {
+            updateAvatar(BitmapFactory.decodeResource(getResources(), R.drawable.avatar_60));
+            mNavigationView.setNavigationItemSelectedListener(
+                    new NavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(MenuItem item) {
+                    showShackbar(item.getTitle().toString());
+                    item.setChecked(true);
+                    mNavigationDrawer.closeDrawer(GravityCompat.START);
+                    return false;
+                }
+            });
+        }
+    }
+
+    public void updateAvatar(Bitmap bitmap) {
+        ImageView avatarImg = (ImageView)
+                mNavigationView.getHeaderView(0).findViewById(R.id.avatar);
+        RoundedAvatarDrawable avatarDrawable = new RoundedAvatarDrawable(bitmap);
+        avatarDrawable.setAntiAlias(true);
+        avatarImg.setImageDrawable(avatarDrawable);
     }
 
     /**
@@ -225,16 +246,4 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mDataManager.getPreferencesManager().saveUserProfileData(userData);
     }
 
-    /*
-    private void runWithDelay() {
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // TODO: выполнить с задержкой
-                hideProgress();
-            }
-        }, 5000);
-    }
-    */
 }
