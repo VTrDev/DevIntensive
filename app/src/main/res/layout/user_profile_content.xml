@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <!-- User Profile Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/spacing_normal_16"
+        android:paddingBottom="@dimen/spacing_normal_16"
+        android:background="@color/grey">
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="@dimen/profile_header_content_height"
+                      android:orientation="horizontal"
+                      android:background="@color/grey">
+
+            <!-- Rating -->
+            <LinearLayout
+                style="@style/UserInfoBlock"
+                android:layout_weight="0.25">
+
+                <TextView
+                    android:id="@+id/user_rating_tv"
+                    style="@style/UserInfoText.Value"
+                    android:text="15"/>
+
+                <TextView
+                    style="@style/UserInfoText"
+                    android:text="@string/user_info_rating"/>
+
+            </LinearLayout>
+
+            <View style="@style/UserInfoDivider" />
+
+            <!-- Code lines -->
+            <LinearLayout
+                style="@style/UserInfoBlock"
+                android:layout_weight="0.50">
+
+                <TextView
+                    android:id="@+id/user_codelines_tv"
+                    style="@style/UserInfoText.Value"
+                    android:text="50000"/>
+
+                <TextView
+                    style="@style/UserInfoText"
+                    android:text="@string/user_info_codelines"/>
+
+            </LinearLayout>
+
+            <View style="@style/UserInfoDivider" />
+
+            <!-- Projects -->
+            <LinearLayout
+                style="@style/UserInfoBlock"
+                android:layout_weight="0.25">
+
+                <TextView
+                    android:id="@+id/user_projects_tv"
+                    style="@style/UserInfoText.Value"
+                    android:text="5"/>
+
+                <TextView
+                    style="@style/UserInfoText"
+                    android:text="@string/user_info_projects"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- User Profile Items -->
+
+    <!-- Phone -->
+    <LinearLayout style="@style/UserItemBlock">
+
+        <ImageView
+            style="@style/Icon.Left"
+            android:src="@drawable/ic_call_black_24dp"/>
+
+        <LinearLayout style="@style/UserItemTextWrapper">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/phone_et"
+                    style="@style/UserItemEditText"
+                    android:hint="@string/user_item_hint_phone"
+                    android:inputType="phone"
+                    android:text="+7 (909) 4xx-xx-xx "
+                    android:enabled="false"
+                    android:focusable="false" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/call_img"
+            style="@style/Icon.Right"
+            android:src="@drawable/ic_phone_in_talk_black_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/UserItemDivider"/>
+
+    <!-- E-mail -->
+    <LinearLayout style="@style/UserItemBlock">
+
+        <ImageView
+            style="@style/Icon.Left"
+            android:src="@drawable/ic_email_black_24dp"/>
+
+        <LinearLayout style="@style/UserItemTextWrapper">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/email_et"
+                    style="@style/UserItemEditText"
+                    android:hint="@string/user_item_hint_email"
+                    android:inputType="textEmailAddress"
+                    android:text="trusov.public@gmail.com"
+                    android:enabled="false"
+                    android:focusable="false" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            style="@style/Icon.Right"
+            android:src="@drawable/ic_send_black_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/UserItemDivider"/>
+
+    <!-- VK profile -->
+    <LinearLayout style="@style/UserItemBlock">
+
+        <ImageView
+            style="@style/Icon.Left"
+            android:src="@drawable/vk_circle_24dp"/>
+
+        <LinearLayout style="@style/UserItemTextWrapper">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/vk_et"
+                    style="@style/UserItemEditText"
+                    android:hint="@string/user_item_hint_vk"
+                    android:inputType="text"
+                    android:text="vk.com/v.a.trusov"
+                    android:enabled="false"
+                    android:focusable="false" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            style="@style/Icon.Right"
+            android:src="@drawable/ic_remove_red_eye_black_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/UserItemDivider"/>
+
+    <!-- GitHub repository -->
+    <LinearLayout style="@style/UserItemBlock">
+
+        <ImageView
+            style="@style/Icon.Left"
+            android:src="@drawable/github_circle_24dp"/>
+
+        <LinearLayout style="@style/UserItemTextWrapper">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/github_et"
+                    style="@style/UserItemEditText"
+                    android:hint="@string/user_item_hint_git"
+                    android:inputType="textUri"
+                    android:text="github.com/vtr-dev/DevIntensive"
+                    android:enabled="false"
+                    android:focusable="false" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            style="@style/Icon.Right"
+            android:src="@drawable/ic_remove_red_eye_black_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/UserItemDivider"/>
+
+    <!-- About me -->
+    <LinearLayout style="@style/UserItemBlock">
+
+        <ImageView
+            style="@style/Icon.Left"
+            android:src="@drawable/ic_account_circle_24dp"/>
+
+        <LinearLayout style="@style/UserItemTextWrapper.Multiline">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/bio_et"
+                    style="@style/UserItemEditText"
+                    android:hint="@string/user_item_hint_about"
+                    android:inputType="textMultiLine"
+                    android:text="@string/lorem_ipsum"
+                    android:enabled="false"
+                    android:focusable="false" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

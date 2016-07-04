@@ -43,7 +43,7 @@
     <style name="UserInfoDivider">
         <item name="android:layout_width">@dimen/line_size_2</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:background">@color/grey_middle_light</item>
+        <item name="android:background">@color/grey_light</item>
     </style>
     <style name="UserInfoText">
         <item name="android:layout_width">wrap_content</item>
