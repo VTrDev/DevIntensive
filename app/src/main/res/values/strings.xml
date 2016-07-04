@@ -15,4 +15,10 @@
     <string name="user_profile.dialog.cancel">Отмена</string>
     <string name="user_profile.dialog.title">Изменить фотографию профиля</string>
     <string name="user_profile.chose.message">выберите фото</string>
+    <string name="validation.msg.phone">Введите номер телефона в формате \n+x xxx xxx-xx-xx  (от 11 до 20 цифр)</string>
+    <string name="validation.msg.email">Ошибка в адресе электронной почты</string>
+    <string name="validation.msg.vk">Адрес аккаунта VK должен иметь формат vk.com/ххх</string>
+    <string name="validation.msg.git">Адрес аккаунта GitHub должен иметь формат github.com/ххх</string>
+    <string name="snackbar_msg.edit_on">Редактирование включено</string>
+    <string name="snackbar_msg.data_saved">Данные сохранены</string>
 </resources>

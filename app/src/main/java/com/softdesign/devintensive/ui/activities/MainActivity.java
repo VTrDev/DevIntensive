@@ -31,6 +31,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -39,6 +40,7 @@ import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.RoundedAvatarDrawable;
+import com.softdesign.devintensive.utils.ValidateHelper;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -151,6 +153,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "onPause");
+
+        if (validateUserInfoValues(false)) {
+            saveUserInfoValues();
+        }
     }
 
     @Override
@@ -176,13 +182,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.fab:
                 if (mCurrentEditMode == 0) {
-                    showShackbar("Редактирование включено");
+                    showShackbar(getString(R.string.snackbar_msg_edit_on));
                     changeEditMode(1);
                     mCurrentEditMode = 1;
                 } else {
-                    showShackbar("Данные сохранены");
-                    changeEditMode(0);
-                    mCurrentEditMode = 0;
+                    if (validateUserInfoValues(true)) {
+                        showShackbar(getString(R.string.snackbar_msg_data_saved));
+                        changeEditMode(0);
+                        mCurrentEditMode = 0;
+                    }
                 }
                 break;
             case R.id.profile_placeholder:
@@ -306,6 +314,75 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mCollapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.white));
 
             saveUserInfoValues();
+        }
+    }
+
+    /**
+     * Осуществляет валидацию полей профайла пользователя. Отображает соответствующие сообщения.
+     * @param showMsg управляет отображением сообщений об ошибках валидации в SnackBar
+     * @return true, если валидация пройдена и false - в противном случае
+     */
+    private boolean validateUserInfoValues(boolean showMsg) {
+
+        String userPhone = ValidateHelper.getValidatedPhone(mUserPhone.getText().toString());
+        if (userPhone != null) {
+            mUserPhone.setText(ValidateHelper.formatRegularPhone(userPhone));
+        } else {
+            if (showMsg) {
+                setFieldFocus(mUserPhone, true);
+                showShackbar(getString(R.string.validation_msg_phone));
+            }
+            return false;
+        }
+
+        String userMail = ValidateHelper.getValidatedEmail(mUserMail.getText().toString());
+        if (userMail != null) {
+            mUserMail.setText(userMail);
+        } else {
+            if (showMsg) {
+                setFieldFocus(mUserMail, true);
+                showShackbar(getString(R.string.validation_msg_email));
+            }
+            return false;
+        }
+
+        String userVk = ValidateHelper.getValidatedVkUrl(mUserVk.getText().toString());
+        if (userVk != null) {
+            mUserVk.setText(userVk);
+        } else {
+            if (showMsg) {
+                setFieldFocus(mUserVk, true);
+                showShackbar(getString(R.string.validation_msg_vk));
+            }
+            return false;
+        }
+
+        String userGit = ValidateHelper.getValidatedGitUrl(mUserGit.getText().toString());
+        if (userGit != null) {
+            mUserGit.setText(userGit);
+        } else {
+            if (showMsg) {
+                setFieldFocus(mUserGit, true);
+                showShackbar(getString(R.string.validation_msg_git));
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Устанавливает фокус ввода на представление, заданное параметром
+     * @param view представление, принимающее фокус
+     * @param hideKeyboard флаг, запрещающий отображение клавиатуры
+     */
+    private void setFieldFocus(View view, boolean hideKeyboard) {
+        if (view != null) {
+            view.requestFocus();
+            if (hideKeyboard) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mUserMail.getWindowToken(), 0);
+            }
         }
     }
 
