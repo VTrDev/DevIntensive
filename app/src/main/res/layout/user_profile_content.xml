@@ -20,53 +20,53 @@
 
             <!-- Rating -->
             <LinearLayout
-                style="@style/UserInfoBlock"
+                style="@style/ProfileHeader"
                 android:layout_weight="0.25">
 
                 <TextView
                     android:id="@+id/user_rating_tv"
-                    style="@style/UserInfoText.Value"
+                    style="@style/ProfileHeaderText.Value"
                     android:text="15"/>
 
                 <TextView
-                    style="@style/UserInfoText"
-                    android:text="@string/user_info_rating"/>
+                    style="@style/ProfileHeaderText.Hint"
+                    android:text="@string/user_profile.header.rating"/>
 
             </LinearLayout>
 
-            <View style="@style/UserInfoDivider" />
+            <View style="@style/ProfileHeaderDivider" />
 
             <!-- Code lines -->
             <LinearLayout
-                style="@style/UserInfoBlock"
+                style="@style/ProfileHeader"
                 android:layout_weight="0.50">
 
                 <TextView
                     android:id="@+id/user_codelines_tv"
-                    style="@style/UserInfoText.Value"
+                    style="@style/ProfileHeaderText.Value"
                     android:text="50000"/>
 
                 <TextView
-                    style="@style/UserInfoText"
-                    android:text="@string/user_info_codelines"/>
+                    style="@style/ProfileHeaderText.Hint"
+                    android:text="@string/user_profile.header.codelines"/>
 
             </LinearLayout>
 
-            <View style="@style/UserInfoDivider" />
+            <View style="@style/ProfileHeaderDivider" />
 
             <!-- Projects -->
             <LinearLayout
-                style="@style/UserInfoBlock"
+                style="@style/ProfileHeader"
                 android:layout_weight="0.25">
 
                 <TextView
                     android:id="@+id/user_projects_tv"
-                    style="@style/UserInfoText.Value"
+                    style="@style/ProfileHeaderText.Value"
                     android:text="5"/>
 
                 <TextView
-                    style="@style/UserInfoText"
-                    android:text="@string/user_info_projects"/>
+                    style="@style/ProfileHeaderText.Hint"
+                    android:text="@string/user_profile.header.projects"/>
 
             </LinearLayout>
 
@@ -77,13 +77,13 @@
     <!-- User Profile Items -->
 
     <!-- Phone -->
-    <LinearLayout style="@style/UserItemBlock">
+    <LinearLayout style="@style/ProfileItem">
 
         <ImageView
             style="@style/Icon.Left"
-            android:src="@drawable/ic_call_black_24dp"/>
+            android:src="@drawable/ic_call_grey_24dp"/>
 
-        <LinearLayout style="@style/UserItemTextWrapper">
+        <LinearLayout style="@style/ProfileItemWrapper">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -91,8 +91,8 @@
 
                 <EditText
                     android:id="@+id/phone_et"
-                    style="@style/UserItemEditText"
-                    android:hint="@string/user_item_hint_phone"
+                    style="@style/ProfileItemEditText"
+                    android:hint="@string/user_profile.item.hint.phone"
                     android:inputType="phone"
                     android:text="+7 (909) 4xx-xx-xx "
                     android:enabled="false"
@@ -105,20 +105,20 @@
         <ImageView
             android:id="@+id/call_img"
             style="@style/Icon.Right"
-            android:src="@drawable/ic_phone_in_talk_black_24dp"/>
+            android:src="@drawable/ic_phone_in_talk_grey_24dp"/>
 
     </LinearLayout>
 
-    <View style="@style/UserItemDivider"/>
+    <View style="@style/ProfileItemDivider"/>
 
     <!-- E-mail -->
-    <LinearLayout style="@style/UserItemBlock">
+    <LinearLayout style="@style/ProfileItem">
 
         <ImageView
             style="@style/Icon.Left"
-            android:src="@drawable/ic_email_black_24dp"/>
+            android:src="@drawable/ic_email_grey_24dp"/>
 
-        <LinearLayout style="@style/UserItemTextWrapper">
+        <LinearLayout style="@style/ProfileItemWrapper">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -126,8 +126,8 @@
 
                 <EditText
                     android:id="@+id/email_et"
-                    style="@style/UserItemEditText"
-                    android:hint="@string/user_item_hint_email"
+                    style="@style/ProfileItemEditText"
+                    android:hint="@string/user_profile.item.hint.email"
                     android:inputType="textEmailAddress"
                     android:text="trusov.public@gmail.com"
                     android:enabled="false"
@@ -138,21 +138,22 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/mail_img"
             style="@style/Icon.Right"
-            android:src="@drawable/ic_send_black_24dp"/>
+            android:src="@drawable/ic_send_grey_24dp"/>
 
     </LinearLayout>
 
-    <View style="@style/UserItemDivider"/>
+    <View style="@style/ProfileItemDivider"/>
 
     <!-- VK profile -->
-    <LinearLayout style="@style/UserItemBlock">
+    <LinearLayout style="@style/ProfileItem">
 
         <ImageView
             style="@style/Icon.Left"
-            android:src="@drawable/vk_circle_24dp"/>
+            android:src="@drawable/ic_vk_circle_grey_24dp"/>
 
-        <LinearLayout style="@style/UserItemTextWrapper">
+        <LinearLayout style="@style/ProfileItemWrapper">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -160,8 +161,8 @@
 
                 <EditText
                     android:id="@+id/vk_et"
-                    style="@style/UserItemEditText"
-                    android:hint="@string/user_item_hint_vk"
+                    style="@style/ProfileItemEditText"
+                    android:hint="@string/user_profile.item.hint.vk"
                     android:inputType="text"
                     android:text="vk.com/v.a.trusov"
                     android:enabled="false"
@@ -172,21 +173,22 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/vk_img"
             style="@style/Icon.Right"
-            android:src="@drawable/ic_remove_red_eye_black_24dp"/>
+            android:src="@drawable/ic_eye_grey_24dp"/>
 
     </LinearLayout>
 
-    <View style="@style/UserItemDivider"/>
+    <View style="@style/ProfileItemDivider"/>
 
     <!-- GitHub repository -->
-    <LinearLayout style="@style/UserItemBlock">
+    <LinearLayout style="@style/ProfileItem">
 
         <ImageView
             style="@style/Icon.Left"
-            android:src="@drawable/github_circle_24dp"/>
+            android:src="@drawable/ic_github_circle_grey_24dp"/>
 
-        <LinearLayout style="@style/UserItemTextWrapper">
+        <LinearLayout style="@style/ProfileItemWrapper">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -194,8 +196,8 @@
 
                 <EditText
                     android:id="@+id/github_et"
-                    style="@style/UserItemEditText"
-                    android:hint="@string/user_item_hint_git"
+                    style="@style/ProfileItemEditText"
+                    android:hint="@string/user_profile.item.hint.git"
                     android:inputType="textUri"
                     android:text="github.com/vtr-dev/DevIntensive"
                     android:enabled="false"
@@ -206,21 +208,22 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/git_img"
             style="@style/Icon.Right"
-            android:src="@drawable/ic_remove_red_eye_black_24dp"/>
+            android:src="@drawable/ic_eye_grey_24dp"/>
 
     </LinearLayout>
 
-    <View style="@style/UserItemDivider"/>
+    <View style="@style/ProfileItemDivider"/>
 
     <!-- About me -->
-    <LinearLayout style="@style/UserItemBlock">
+    <LinearLayout style="@style/ProfileItem">
 
         <ImageView
             style="@style/Icon.Left"
-            android:src="@drawable/ic_account_circle_24dp"/>
+            android:src="@drawable/ic_account_circle_grey_24dp"/>
 
-        <LinearLayout style="@style/UserItemTextWrapper.Multiline">
+        <LinearLayout style="@style/ProfileItemWrapper.Multiline">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -228,8 +231,8 @@
 
                 <EditText
                     android:id="@+id/bio_et"
-                    style="@style/UserItemEditText"
-                    android:hint="@string/user_item_hint_about"
+                    style="@style/ProfileItemEditText"
+                    android:hint="@string/user_profile.item.hint.bio"
                     android:inputType="textMultiLine"
                     android:text="@string/lorem_ipsum"
                     android:enabled="false"

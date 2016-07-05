@@ -58,6 +58,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private int mCurrentEditMode = 0;
 
     private ImageView mCallImg;
+    private ImageView mMailImg;
+    private ImageView mVkImg;
+    private ImageView mGitImg;
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
     private DrawerLayout mNavigationDrawer;
@@ -84,6 +87,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mDataManager = DataManager.getInstance();
 
         mCallImg = (ImageView) findViewById(R.id.call_img);
+        mMailImg = (ImageView) findViewById(R.id.mail_img);
+        mVkImg = (ImageView) findViewById(R.id.vk_img);
+        mGitImg = (ImageView) findViewById(R.id.git_img);
+
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coordinator_container);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mNavigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
@@ -108,6 +115,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mUserInfoViews.add(mUserBio);
 
         mCallImg.setOnClickListener(this);
+        mMailImg.setOnClickListener(this);
+        mVkImg.setOnClickListener(this);
+        mGitImg.setOnClickListener(this);
+
         mFab.setOnClickListener(this);
         mProfilePlaceholder.setOnClickListener(this);
 
@@ -116,7 +127,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         loadUserInfoValues();
         Picasso.with(this)
                 .load(mDataManager.getPreferencesManager().loadUserPhoto())
-                .placeholder(R.drawable.userphoto) // TODO: 02.07.2016 Сделать плейсхолдер и transform + crop
+                .placeholder(R.drawable.user_bg)
                 .into(mProfileImage);
 
         if (savedInstanceState == null) {
@@ -196,7 +207,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.profile_placeholder:
                 showDialog(ConstantManager.LOAD_PROFILE_PHOTO);
                 break;
-
+            case R.id.call_img:
+                if (mCurrentEditMode == 0) {
+                    callPhone(mUserPhone.getText().toString());
+                }
+                break;
+            case R.id.mail_img:
+                if (mCurrentEditMode == 0) {
+                    sendMail(mUserPhone.getText().toString());
+                }
+                break;
+            case R.id.vk_img:
+                if (mCurrentEditMode == 0) {
+                    browseUrl("https://" + mUserVk.getText().toString());
+                }
+                break;
+            case R.id.git_img:
+                if (mCurrentEditMode == 0) {
+                    browseUrl("https://" + mUserGit.getText().toString());
+                }
+                break;
         }
     }
 
@@ -227,7 +257,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mAppBarParams = (AppBarLayout.LayoutParams) mCollapsingToolbar.getLayoutParams();
 
         if (actionBar != null) {
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -288,20 +318,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      */
     private void changeEditMode(int mode) {
         if (mode == 1) {
-            mFab.setImageResource(R.drawable.ic_done_black_24dp);
+            mFab.setImageResource(R.drawable.ic_done_white_24dp);
 
             for (EditText userValue : mUserInfoViews) {
                 userValue.setEnabled(true);
                 userValue.setFocusable(true);
                 userValue.setFocusableInTouchMode(true);
             }
+            setFieldFocus(mUserPhone, false);
 
             showProfilePlaceholder();
             lockToolbar();
             mCollapsingToolbar.setExpandedTitleColor(Color.TRANSPARENT);
 
         } else {
-            mFab.setImageResource(R.drawable.ic_create_black_24dp);
+            mFab.setImageResource(R.drawable.ic_create_white_24dp);
 
             for (EditText userValue : mUserInfoViews) {
                 userValue.setEnabled(false);
@@ -319,7 +350,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     /**
      * Осуществляет валидацию полей профайла пользователя. Отображает соответствующие сообщения.
-     * @param showMsg управляет отображением сообщений об ошибках валидации в SnackBar
+     * @param showMsg разрешить (запретить) отображение сообщений об ошибках валидации в SnackBar
      * @return true, если валидация пройдена и false - в противном случае
      */
     private boolean validateUserInfoValues(boolean showMsg) {
@@ -374,7 +405,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     /**
      * Устанавливает фокус ввода на представление, заданное параметром
      * @param view представление, принимающее фокус
-     * @param hideKeyboard флаг, запрещающий отображение клавиатуры
+     * @param hideKeyboard запретить (разрешить) отображение клавиатуры
      */
     private void setFieldFocus(View view, boolean hideKeyboard) {
         if (view != null) {
@@ -439,7 +470,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 // TODO: 01.07.2016 обработать ошибку
             }
             if (mPhotoFile != null) {
-                // TODO: 01.07.2016 передать фотофайл в интент
                 takeCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mPhotoFile));
                 startActivityForResult(takeCaptureIntent, ConstantManager.REQUEST_CAMERA_PICTURE);
             }
@@ -452,8 +482,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             // предоставление пользователю возможности установить разрешения,
             // если он ранее запретил их и выбрал опцию "не показывать больше"
-            Snackbar.make(mCoordinatorLayout, "Для корректной работы приложения необходимо дать требуемые разрешения", Snackbar.LENGTH_LONG)
-                    .setAction("Разрешить", new View.OnClickListener() {
+            Snackbar.make(mCoordinatorLayout, R.string.snackbar_msg_permissions_request, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.action_allow_permissions, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             openApplicationSettings();
@@ -468,11 +498,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 && grantResults.length == 2) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // TODO: 02.07.2016  тут обрабатываем разрешение (разрешение получено)
-                // например вывести сообщение или обрабоать какой-то логикой если нужно
+                // например вывести сообщение или обработать какой-то логикой если нужно
             }
             if (grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 // TODO: 02.07.2016  тут обрабатываем разрешение (разрешение получено)
-                // например вывести сообщение или обрабоать какой-то логикой если нужно
+                // например вывести сообщение или обработать какой-то логикой если нужно
             }
         }
     }
@@ -589,6 +619,34 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 Uri.parse("package:" + getPackageName()));
 
         startActivityForResult(appSettingsIntent, ConstantManager.PERMISSION_REQUEST_SETTINGS_CODE);
+    }
+
+
+    /**
+     * Инициирует телефонный звонок на заданный номер
+     * @param phoneStr номер телефона
+     */
+    private void callPhone(String phoneStr) {
+        Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phoneStr));
+        startActivity(dialIntent);
+    }
+
+    /**
+     * Инициирует отправку письма по электронной почте
+     * @param email адрес электронной почты
+     */
+    private void sendMail(String email) {
+        Intent mailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + email));
+        startActivity(Intent.createChooser(mailIntent, getString(R.string.chooser_title_send_mail)));
+    }
+
+    /**
+     * Открывает ссылку в браузере по заданному URL-адресу
+     * @param url URL-адрес
+     */
+    private void browseUrl(String url) {
+        Intent browseIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browseIntent);
     }
 
 }

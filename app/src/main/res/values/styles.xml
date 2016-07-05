@@ -33,37 +33,40 @@
         <item name="android:layout_marginRight">@dimen/spacing_medium_32</item>
     </style>
 
-    <!-- User Info Styles -->
-    <style name="UserInfoBlock">
+    <!-- Profile Header Styles -->
+    <style name="ProfileHeader">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:orientation">vertical</item>
         <item name="android:gravity">center</item>
     </style>
-    <style name="UserInfoDivider">
+    <style name="ProfileHeaderDivider">
         <item name="android:layout_width">@dimen/line_size_2</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:background">@color/grey_light</item>
     </style>
-    <style name="UserInfoText">
+    <style name="ProfileHeaderText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:fontFamily">sans-serif-condensed</item>
     </style>
-    <style name="UserInfoText.Value">
+    <style name="ProfileHeaderText.Value">
         <item name="android:textSize">24sp</item>
     </style>
+    <style name="ProfileHeaderText.Hint">
+        <item name="android:textSize">14sp</item>
+    </style>
 
-    <!-- User Items Styles -->
-    <style name="UserItemBlock">
+    <!-- Profile Items Styles -->
+    <style name="ProfileItem">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">horizontal</item>
         <item name="android:layout_marginTop">@dimen/spacing_small_8</item>
         <item name="android:layout_marginBottom">@dimen/spacing_small_8</item>
     </style>
-    <style name="UserItemTextWrapper">
+    <style name="ProfileItemWrapper">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/size_large_72</item>
         <item name="android:layout_weight">1</item>
@@ -72,11 +75,11 @@
         <item name="android:layout_marginLeft">@dimen/spacing_medium_32</item>
         <item name="android:layout_marginRight">@dimen/spacing_normal_16</item>
     </style>
-    <style name="UserItemTextWrapper.Multiline">
+    <style name="ProfileItemWrapper.Multiline">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">@dimen/spacing_normal_16</item>
     </style>
-    <style name="UserItemEditText">
+    <style name="ProfileItemEditText">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/black</item>
@@ -84,14 +87,37 @@
         <item name="android:fontFamily">sans-serif-condensed</item>
         <item name="android:textSize">16sp</item>
     </style>
-    <style name="UserItemDivider">
+    <style name="ProfileItemDivider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/line_size</item>
         <item name="android:background">@color/grey_light</item>
         <item name="android:layout_marginLeft">@dimen/spacing_larger_72</item>
     </style>
 
-    <style name="custom_dialog">
+    <!-- Auth activity Styles -->
+    <style name="AuthTextInputLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/spacing_small_8</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_medial_24</item>
+        <item name="android:layout_marginRight">@dimen/spacing_medial_24</item>
+        <item name="android:textColorHint">@color/grey_light</item>
+        <item name="hintTextAppearance">@style/AuthEditTextHint</item>
+    </style>
+    <style name="AuthEditTextHint" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/grey_light</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="AuthEditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+
+    <!-- Other styles -->
+
+    <style name="CustomDialog">
         <item name="android:fullDark">@android:color/transparent</item>
     </style>
 
