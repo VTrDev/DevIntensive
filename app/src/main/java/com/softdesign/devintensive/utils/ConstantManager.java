@@ -4,6 +4,8 @@ public interface ConstantManager {
     String TAG_PREFIX = "DEV ";
 
     String EDIT_MODE_KEY = "EDIT_MODE_KEY";
+    int EDIT_MODE_ON = 1;
+    int EDIT_MODE_OFF = 0;
 
     String USER_PHONE_KEY = "USER_1_KEY";
     String USER_MAIL_KEY = "USER_2_KEY";

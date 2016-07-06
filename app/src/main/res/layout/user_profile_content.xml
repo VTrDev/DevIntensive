@@ -20,52 +20,52 @@
 
             <!-- Rating -->
             <LinearLayout
-                style="@style/ProfileHeader"
+                style="@style/profile_header"
                 android:layout_weight="0.25">
 
                 <TextView
                     android:id="@+id/user_rating_tv"
-                    style="@style/ProfileHeaderText.Value"
-                    android:text="15"/>
+                    style="@style/profile_header_text.value"
+                    android:text="@string/user_profile.dummy.rating"/>
 
                 <TextView
-                    style="@style/ProfileHeaderText.Hint"
+                    style="@style/profile_header_text.hint"
                     android:text="@string/user_profile.header.rating"/>
 
             </LinearLayout>
 
-            <View style="@style/ProfileHeaderDivider" />
+            <View style="@style/profile_header_divider" />
 
             <!-- Code lines -->
             <LinearLayout
-                style="@style/ProfileHeader"
+                style="@style/profile_header"
                 android:layout_weight="0.50">
 
                 <TextView
                     android:id="@+id/user_codelines_tv"
-                    style="@style/ProfileHeaderText.Value"
-                    android:text="50000"/>
+                    style="@style/profile_header_text.value"
+                    android:text="@string/user_profile.dummy.codelines"/>
 
                 <TextView
-                    style="@style/ProfileHeaderText.Hint"
+                    style="@style/profile_header_text.hint"
                     android:text="@string/user_profile.header.codelines"/>
 
             </LinearLayout>
 
-            <View style="@style/ProfileHeaderDivider" />
+            <View style="@style/profile_header_divider" />
 
             <!-- Projects -->
             <LinearLayout
-                style="@style/ProfileHeader"
+                style="@style/profile_header"
                 android:layout_weight="0.25">
 
                 <TextView
                     android:id="@+id/user_projects_tv"
-                    style="@style/ProfileHeaderText.Value"
-                    android:text="5"/>
+                    style="@style/profile_header_text.value"
+                    android:text="@string/user_profile.dummy.projects"/>
 
                 <TextView
-                    style="@style/ProfileHeaderText.Hint"
+                    style="@style/profile_header_text.hint"
                     android:text="@string/user_profile.header.projects"/>
 
             </LinearLayout>
@@ -77,24 +77,25 @@
     <!-- User Profile Items -->
 
     <!-- Phone -->
-    <LinearLayout style="@style/ProfileItem">
+    <LinearLayout style="@style/profile_item">
 
         <ImageView
-            style="@style/Icon.Left"
+            style="@style/icon.left"
             android:src="@drawable/ic_call_grey_24dp"/>
 
-        <LinearLayout style="@style/ProfileItemWrapper">
+        <LinearLayout style="@style/profile_item_wrapper">
 
             <android.support.design.widget.TextInputLayout
+                android:id="@+id/phone_text_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <EditText
                     android:id="@+id/phone_et"
-                    style="@style/ProfileItemEditText"
+                    style="@style/profile_item_edit_text"
                     android:hint="@string/user_profile.item.hint.phone"
                     android:inputType="phone"
-                    android:text="+7 (909) 4xx-xx-xx "
+                    android:text="@string/user_profile.dummy.phone"
                     android:enabled="false"
                     android:focusable="false" />
 
@@ -104,32 +105,33 @@
 
         <ImageView
             android:id="@+id/call_img"
-            style="@style/Icon.Right"
+            style="@style/icon.right"
             android:src="@drawable/ic_phone_in_talk_grey_24dp"/>
 
     </LinearLayout>
 
-    <View style="@style/ProfileItemDivider"/>
+    <View style="@style/profile_item_divider"/>
 
     <!-- E-mail -->
-    <LinearLayout style="@style/ProfileItem">
+    <LinearLayout style="@style/profile_item">
 
         <ImageView
-            style="@style/Icon.Left"
+            style="@style/icon.left"
             android:src="@drawable/ic_email_grey_24dp"/>
 
-        <LinearLayout style="@style/ProfileItemWrapper">
+        <LinearLayout style="@style/profile_item_wrapper">
 
             <android.support.design.widget.TextInputLayout
+                android:id="@+id/email_text_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <EditText
                     android:id="@+id/email_et"
-                    style="@style/ProfileItemEditText"
+                    style="@style/profile_item_edit_text"
                     android:hint="@string/user_profile.item.hint.email"
                     android:inputType="textEmailAddress"
-                    android:text="trusov.public@gmail.com"
+                    android:text="@string/user_profile.dummy.email"
                     android:enabled="false"
                     android:focusable="false" />
 
@@ -139,32 +141,33 @@
 
         <ImageView
             android:id="@+id/mail_img"
-            style="@style/Icon.Right"
+            style="@style/icon.right"
             android:src="@drawable/ic_send_grey_24dp"/>
 
     </LinearLayout>
 
-    <View style="@style/ProfileItemDivider"/>
+    <View style="@style/profile_item_divider"/>
 
     <!-- VK profile -->
-    <LinearLayout style="@style/ProfileItem">
+    <LinearLayout style="@style/profile_item">
 
         <ImageView
-            style="@style/Icon.Left"
+            style="@style/icon.left"
             android:src="@drawable/ic_vk_circle_grey_24dp"/>
 
-        <LinearLayout style="@style/ProfileItemWrapper">
+        <LinearLayout style="@style/profile_item_wrapper">
 
             <android.support.design.widget.TextInputLayout
+                android:id="@+id/vk_text_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <EditText
                     android:id="@+id/vk_et"
-                    style="@style/ProfileItemEditText"
+                    style="@style/profile_item_edit_text"
                     android:hint="@string/user_profile.item.hint.vk"
                     android:inputType="text"
-                    android:text="vk.com/v.a.trusov"
+                    android:text="@string/user_profile.dummy.vk"
                     android:enabled="false"
                     android:focusable="false" />
 
@@ -174,32 +177,33 @@
 
         <ImageView
             android:id="@+id/vk_img"
-            style="@style/Icon.Right"
+            style="@style/icon.right"
             android:src="@drawable/ic_eye_grey_24dp"/>
 
     </LinearLayout>
 
-    <View style="@style/ProfileItemDivider"/>
+    <View style="@style/profile_item_divider"/>
 
     <!-- GitHub repository -->
-    <LinearLayout style="@style/ProfileItem">
+    <LinearLayout style="@style/profile_item">
 
         <ImageView
-            style="@style/Icon.Left"
+            style="@style/icon.left"
             android:src="@drawable/ic_github_circle_grey_24dp"/>
 
-        <LinearLayout style="@style/ProfileItemWrapper">
+        <LinearLayout style="@style/profile_item_wrapper">
 
             <android.support.design.widget.TextInputLayout
+                android:id="@+id/github_text_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <EditText
                     android:id="@+id/github_et"
-                    style="@style/ProfileItemEditText"
+                    style="@style/profile_item_edit_text"
                     android:hint="@string/user_profile.item.hint.git"
                     android:inputType="textUri"
-                    android:text="github.com/vtr-dev/DevIntensive"
+                    android:text="@string/user_profile.dummy.github"
                     android:enabled="false"
                     android:focusable="false" />
 
@@ -209,21 +213,21 @@
 
         <ImageView
             android:id="@+id/git_img"
-            style="@style/Icon.Right"
+            style="@style/icon.right"
             android:src="@drawable/ic_eye_grey_24dp"/>
 
     </LinearLayout>
 
-    <View style="@style/ProfileItemDivider"/>
+    <View style="@style/profile_item_divider"/>
 
     <!-- About me -->
-    <LinearLayout style="@style/ProfileItem">
+    <LinearLayout style="@style/profile_item">
 
         <ImageView
-            style="@style/Icon.Left"
+            style="@style/icon.left"
             android:src="@drawable/ic_account_circle_grey_24dp"/>
 
-        <LinearLayout style="@style/ProfileItemWrapper.Multiline">
+        <LinearLayout style="@style/profile_item_wrapper">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -231,10 +235,10 @@
 
                 <EditText
                     android:id="@+id/bio_et"
-                    style="@style/ProfileItemEditText"
+                    style="@style/profile_item_edit_text"
                     android:hint="@string/user_profile.item.hint.bio"
                     android:inputType="textMultiLine"
-                    android:text="@string/lorem_ipsum"
+                    android:text="@string/user_profile.dummy.bio"
                     android:enabled="false"
                     android:focusable="false" />
 

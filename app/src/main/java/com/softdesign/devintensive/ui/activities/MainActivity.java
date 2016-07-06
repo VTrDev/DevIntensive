@@ -21,6 +21,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -35,6 +36,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
@@ -59,7 +61,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public static final String TAG = ConstantManager.TAG_PREFIX + "MainActivity";
 
     private DataManager mDataManager;
-    private int mCurrentEditMode = 0;
+    private int mCurrentEditMode = ConstantManager.EDIT_MODE_OFF;
 
     @BindView(R.id.main_coordinator_container) CoordinatorLayout mCoordinatorLayout;
     @BindView(R.id.toolbar) Toolbar mToolbar;
@@ -81,6 +83,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @BindView(R.id.vk_et) EditText mUserVk;
     @BindView(R.id.github_et) EditText mUserGit;
     @BindView(R.id.bio_et) EditText mUserBio;
+
+    @BindView(R.id.phone_text_layout) TextInputLayout mUserPhoneLayout;
+    @BindView(R.id.email_text_layout) TextInputLayout mUserMailLayout;
+    @BindView(R.id.vk_text_layout) TextInputLayout mUserVkLayout;
+    @BindView(R.id.github_text_layout) TextInputLayout mUserGitLayout;
+
+    @BindView(R.id.user_rating_tv) TextView mUserRating;
+    @BindView(R.id.user_codelines_tv) TextView mUserCodeLines;
+    @BindView(R.id.user_projects_tv) TextView mUserProjects;
 
     // в данном случае не лучший вариант (возможно инициирует повторный findById)
     @BindViews({R.id.phone_et, R.id.email_et, R.id.vk_et, R.id.github_et, R.id.bio_et})
@@ -118,10 +129,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         if (savedInstanceState == null) {
             // активность запускается впервые
-
+            // setUserProfileDummyValues();
         } else {
             // активность уже создавалась
-            mCurrentEditMode = savedInstanceState.getInt(ConstantManager.EDIT_MODE_KEY, 0);
+            mCurrentEditMode = savedInstanceState
+                    .getInt(ConstantManager.EDIT_MODE_KEY, ConstantManager.EDIT_MODE_OFF);
             changeEditMode(mCurrentEditMode);
         }
     }
@@ -178,15 +190,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab:
-                if (mCurrentEditMode == 0) {
+                if (mCurrentEditMode == ConstantManager.EDIT_MODE_OFF) {
                     showShackbar(getString(R.string.snackbar_msg_edit_on));
-                    changeEditMode(1);
-                    mCurrentEditMode = 1;
+                    changeEditMode(ConstantManager.EDIT_MODE_ON);
+                    mCurrentEditMode = ConstantManager.EDIT_MODE_ON;
                 } else {
                     if (validateUserInfoValues(true)) {
                         showShackbar(getString(R.string.snackbar_msg_data_saved));
-                        changeEditMode(0);
-                        mCurrentEditMode = 0;
+                        changeEditMode(ConstantManager.EDIT_MODE_OFF);
+                        mCurrentEditMode = ConstantManager.EDIT_MODE_OFF;
                     }
                 }
                 break;
@@ -194,22 +206,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 showDialog(ConstantManager.LOAD_PROFILE_PHOTO);
                 break;
             case R.id.call_img:
-                if (mCurrentEditMode == 0) {
+                if (mCurrentEditMode == ConstantManager.EDIT_MODE_OFF) {
                     callPhone(mUserPhone.getText().toString());
                 }
                 break;
             case R.id.mail_img:
-                if (mCurrentEditMode == 0) {
+                if (mCurrentEditMode == ConstantManager.EDIT_MODE_OFF) {
                     sendMail(mUserPhone.getText().toString());
                 }
                 break;
             case R.id.vk_img:
-                if (mCurrentEditMode == 0) {
+                if (mCurrentEditMode == ConstantManager.EDIT_MODE_OFF) {
                     browseUrl("https://" + mUserVk.getText().toString());
                 }
                 break;
             case R.id.git_img:
-                if (mCurrentEditMode == 0) {
+                if (mCurrentEditMode == ConstantManager.EDIT_MODE_OFF) {
                     browseUrl("https://" + mUserGit.getText().toString());
                 }
                 break;
@@ -231,10 +243,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    /**
+     * Отображает панель Shackbar, содержащую текстовое сообщение
+     * @param message текст сообщения
+     */
     private void showShackbar(String message) {
         Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG).show();
     }
 
+    /**
+     * Выполняет инициализацию панели Toolbar
+     */
     private void setupToolbar() {
         setSupportActionBar(mToolbar);
 
@@ -248,6 +267,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    /**
+     * Выполняет инициализацию выдвижной панели навигационного меню
+     */
     private void setupDrawer() {
         if (mNavigationView != null) {
             updateAvatar(BitmapFactory.decodeResource(getResources(), R.drawable.avatar_60));
@@ -264,6 +286,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    /**
+     * Изменяет изображение аватара на выдвижной панеле
+     * @param bitmap битовая карта графического изображения
+     */
     public void updateAvatar(Bitmap bitmap) {
         ImageView avatarImg = (ImageView)
                 mNavigationView.getHeaderView(0).findViewById(R.id.avatar);
@@ -303,7 +329,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * @param mode если 1 - режим редактирования, если 0 - режим просмотра
      */
     private void changeEditMode(int mode) {
-        if (mode == 1) {
+        if (mode == ConstantManager.EDIT_MODE_ON) {
             mFab.setImageResource(R.drawable.ic_done_white_24dp);
 
             for (EditText userValue : mUserInfoViews) {
@@ -336,7 +362,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     /**
      * Осуществляет валидацию полей профайла пользователя. Отображает соответствующие сообщения.
-     * @param showMsg разрешить (запретить) отображение сообщений об ошибках валидации в SnackBar
+     * @param showMsg разрешить (запретить) отображение сообщений об ошибках валидации
      * @return true, если валидация пройдена и false - в противном случае
      */
     private boolean validateUserInfoValues(boolean showMsg) {
@@ -344,10 +370,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         String userPhone = ValidateHelper.getValidatedPhone(mUserPhone.getText().toString());
         if (userPhone != null) {
             mUserPhone.setText(ValidateHelper.formatRegularPhone(userPhone));
+            mUserPhoneLayout.setErrorEnabled(false);
         } else {
             if (showMsg) {
                 setFieldFocus(mUserPhone, true);
-                showShackbar(getString(R.string.validation_msg_phone));
+                mUserPhoneLayout.setError(getString(R.string.validation_msg_phone));
             }
             return false;
         }
@@ -355,10 +382,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         String userMail = ValidateHelper.getValidatedEmail(mUserMail.getText().toString());
         if (userMail != null) {
             mUserMail.setText(userMail);
+            mUserMailLayout.setErrorEnabled(false);
         } else {
             if (showMsg) {
                 setFieldFocus(mUserMail, true);
-                showShackbar(getString(R.string.validation_msg_email));
+                mUserMailLayout.setError(getString(R.string.validation_msg_email));
             }
             return false;
         }
@@ -366,10 +394,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         String userVk = ValidateHelper.getValidatedVkUrl(mUserVk.getText().toString());
         if (userVk != null) {
             mUserVk.setText(userVk);
+            mUserVkLayout.setErrorEnabled(false);
         } else {
             if (showMsg) {
                 setFieldFocus(mUserVk, true);
-                showShackbar(getString(R.string.validation_msg_vk));
+                mUserVkLayout.setError(getString(R.string.validation_msg_vk));
             }
             return false;
         }
@@ -377,10 +406,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         String userGit = ValidateHelper.getValidatedGitUrl(mUserGit.getText().toString());
         if (userGit != null) {
             mUserGit.setText(userGit);
+            mUserGitLayout.setErrorEnabled(false);
         } else {
             if (showMsg) {
                 setFieldFocus(mUserGit, true);
-                showShackbar(getString(R.string.validation_msg_git));
+                mUserGitLayout.setError(getString(R.string.validation_msg_git));
             }
             return false;
         }
@@ -633,6 +663,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void browseUrl(String url) {
         Intent browseIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browseIntent);
+    }
+
+    private void setUserProfileDummyValues() {
+        mUserRating.setText(getString(R.string.user_profile_dummy_rating));
+        mUserCodeLines.setText(getString(R.string.user_profile_dummy_codelines));
+        mUserProjects.setText(getString(R.string.user_profile_dummy_projects));
+        mUserPhone.setText(getString(R.string.user_profile_dummy_phone));
+        mUserMail.setText(getString(R.string.user_profile_dummy_email));
+        mUserVk.setText(getString(R.string.user_profile_dummy_vk));
+        mUserGit.setText(getString(R.string.user_profile_dummy_github));
+        mUserBio.setText(getString(R.string.user_profile_dummy_bio));
     }
 
 }

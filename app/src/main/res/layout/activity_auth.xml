@@ -48,24 +48,24 @@
         </LinearLayout>
 
         <android.support.design.widget.TextInputLayout
-            style="@style/AuthTextInputLayout">
+            style="@style/auth_text_input_layout">
 
             <EditText
                 android:id="@+id/login_email_et"
                 android:inputType="textEmailAddress"
                 android:hint="@string/user_auth.email_hint"
-                style="@style/AuthEditText"/>
+                style="@style/auth_edit_text"/>
 
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            style="@style/AuthTextInputLayout">
+            style="@style/auth_text_input_layout">
 
             <EditText
                 android:id="@+id/login_password_et"
                 android:inputType="textPassword"
                 android:hint="@string/user_auth.password_hint"
-                style="@style/AuthEditText"/>
+                style="@style/auth_edit_text"/>
 
         </android.support.design.widget.TextInputLayout>
 

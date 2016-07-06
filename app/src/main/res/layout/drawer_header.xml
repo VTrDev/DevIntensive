@@ -26,11 +26,11 @@
             android:id="@+id/user_name_txt"
             android:text="Трусов Владимир"
             android:fontFamily="sans-serif-medium"
-            style="@style/DrawerHeaderText"/>
+            style="@style/drawer_header_text"/>
 
         <TextView
             android:id="@+id/user_email_txt"
-            style="@style/DrawerHeaderText"
+            style="@style/drawer_header_text"
             android:fontFamily="sans-serif"
             android:text="trusov.public@gmail.com"/>
 
