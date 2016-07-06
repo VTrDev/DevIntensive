@@ -50,6 +50,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     public static final String TAG = ConstantManager.TAG_PREFIX + "MainActivity";
@@ -57,22 +61,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private DataManager mDataManager;
     private int mCurrentEditMode = 0;
 
-    private ImageView mCallImg;
-    private ImageView mMailImg;
-    private ImageView mVkImg;
-    private ImageView mGitImg;
-    private CoordinatorLayout mCoordinatorLayout;
-    private Toolbar mToolbar;
-    private DrawerLayout mNavigationDrawer;
-    private NavigationView mNavigationView;
-    private FloatingActionButton mFab;
-    private RelativeLayout mProfilePlaceholder;
-    private CollapsingToolbarLayout mCollapsingToolbar;
-    private AppBarLayout mAppBarLayout;
-    private ImageView mProfileImage;
+    @BindView(R.id.main_coordinator_container) CoordinatorLayout mCoordinatorLayout;
+    @BindView(R.id.toolbar) Toolbar mToolbar;
+    @BindView(R.id.navigation_drawer) DrawerLayout mNavigationDrawer;
+    @BindView(R.id.navigation_view) NavigationView mNavigationView;
+    @BindView(R.id.fab) FloatingActionButton mFab;
+    @BindView(R.id.profile_placeholder) RelativeLayout mProfilePlaceholder;
+    @BindView(R.id.collapsing_toolbar) CollapsingToolbarLayout mCollapsingToolbar;
+    @BindView(R.id.appbar_layout) AppBarLayout mAppBarLayout;
+    @BindView(R.id.user_photo_img) ImageView mProfileImage;
 
-    private EditText mUserPhone, mUserMail, mUserVk, mUserGit, mUserBio;
-    private List<EditText> mUserInfoViews;
+    @BindView(R.id.call_img) ImageView mCallImg;
+    @BindView(R.id.mail_img) ImageView mMailImg;
+    @BindView(R.id.vk_img) ImageView mVkImg;
+    @BindView(R.id.git_img) ImageView mGitImg;
+
+    @BindView(R.id.phone_et) EditText mUserPhone;
+    @BindView(R.id.email_et) EditText mUserMail;
+    @BindView(R.id.vk_et) EditText mUserVk;
+    @BindView(R.id.github_et) EditText mUserGit;
+    @BindView(R.id.bio_et) EditText mUserBio;
+
+    // в данном случае не лучший вариант (возможно инициирует повторный findById)
+    @BindViews({R.id.phone_et, R.id.email_et, R.id.vk_et, R.id.github_et, R.id.bio_et})
+    List<EditText> mUserInfoViews;
 
     private AppBarLayout.LayoutParams mAppBarParams = null;
     private File mPhotoFile = null;
@@ -84,35 +96,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate");
 
+        ButterKnife.bind(this);
+
         mDataManager = DataManager.getInstance();
-
-        mCallImg = (ImageView) findViewById(R.id.call_img);
-        mMailImg = (ImageView) findViewById(R.id.mail_img);
-        mVkImg = (ImageView) findViewById(R.id.vk_img);
-        mGitImg = (ImageView) findViewById(R.id.git_img);
-
-        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coordinator_container);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mNavigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
-        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
-        mProfilePlaceholder = (RelativeLayout) findViewById(R.id.profile_placeholder);
-        mCollapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar_layout);
-        mProfileImage = (ImageView) findViewById(R.id.user_photo_img);
-
-        mUserPhone = (EditText) findViewById(R.id.phone_et);
-        mUserMail = (EditText) findViewById(R.id.email_et);
-        mUserVk = (EditText) findViewById(R.id.vk_et);
-        mUserGit = (EditText) findViewById(R.id.github_et);
-        mUserBio = (EditText) findViewById(R.id.bio_et);
-
-        mUserInfoViews = new ArrayList<>();
-        mUserInfoViews.add(mUserPhone);
-        mUserInfoViews.add(mUserMail);
-        mUserInfoViews.add(mUserVk);
-        mUserInfoViews.add(mUserGit);
-        mUserInfoViews.add(mUserBio);
 
         mCallImg.setOnClickListener(this);
         mMailImg.setOnClickListener(this);
