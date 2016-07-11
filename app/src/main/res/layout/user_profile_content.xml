@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <!-- User Profile Header -->
+    <LinearLayout
+        android:id="@+id/profile_header_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/spacing_normal_16"
+        android:paddingBottom="@dimen/spacing_normal_16"
+        android:background="@color/grey">
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="@dimen/profile_header_content_height"
+                      android:orientation="horizontal"
+                      android:background="@color/grey">
+
+            <!-- Rating -->
+            <LinearLayout
+                style="@style/profile_header"
+                android:layout_weight="0.25">
+
+                <TextView
+                    android:id="@+id/user_rating_tv"
+                    style="@style/profile_header_text.value"
+                    android:text="@string/user_profile.dummy.rating"/>
+
+                <TextView
+                    style="@style/profile_header_text.hint"
+                    android:text="@string/user_profile.header.rating"/>
+
+            </LinearLayout>
+
+            <View style="@style/profile_header_divider" />
+
+            <!-- Code lines -->
+            <LinearLayout
+                style="@style/profile_header"
+                android:layout_weight="0.50">
+
+                <TextView
+                    android:id="@+id/user_codelines_tv"
+                    style="@style/profile_header_text.value"
+                    android:text="@string/user_profile.dummy.codelines"/>
+
+                <TextView
+                    style="@style/profile_header_text.hint"
+                    android:text="@string/user_profile.header.codelines"/>
+
+            </LinearLayout>
+
+            <View style="@style/profile_header_divider" />
+
+            <!-- Projects -->
+            <LinearLayout
+                style="@style/profile_header"
+                android:layout_weight="0.25">
+
+                <TextView
+                    android:id="@+id/user_projects_tv"
+                    style="@style/profile_header_text.value"
+                    android:text="@string/user_profile.dummy.projects"/>
+
+                <TextView
+                    style="@style/profile_header_text.hint"
+                    android:text="@string/user_profile.header.projects"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- User Profile Items -->
+
+    <!-- Phone -->
+    <LinearLayout style="@style/profile_item">
+
+        <ImageView
+            style="@style/icon.left"
+            android:src="@drawable/ic_call_grey_24dp"/>
+
+        <LinearLayout style="@style/profile_item_wrapper">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/phone_text_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/phone_et"
+                    style="@style/profile_item_edit_text"
+                    android:hint="@string/user_profile.item.hint.phone"
+                    android:inputType="phone"
+                    android:text="@string/user_profile.dummy.phone"
+                    android:enabled="false"
+                    android:focusable="false" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/call_img"
+            style="@style/icon.right"
+            android:src="@drawable/ic_phone_in_talk_grey_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/profile_item_divider"/>
+
+    <!-- E-mail -->
+    <LinearLayout style="@style/profile_item">
+
+        <ImageView
+            style="@style/icon.left"
+            android:src="@drawable/ic_email_grey_24dp"/>
+
+        <LinearLayout style="@style/profile_item_wrapper">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/email_text_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/email_et"
+                    style="@style/profile_item_edit_text"
+                    android:hint="@string/user_profile.item.hint.email"
+                    android:inputType="textEmailAddress"
+                    android:text="@string/user_profile.dummy.email"
+                    android:enabled="false"
+                    android:focusable="false" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/mail_img"
+            style="@style/icon.right"
+            android:src="@drawable/ic_send_grey_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/profile_item_divider"/>
+
+    <!-- VK profile -->
+    <LinearLayout style="@style/profile_item">
+
+        <ImageView
+            style="@style/icon.left"
+            android:src="@drawable/ic_vk_circle_grey_24dp"/>
+
+        <LinearLayout style="@style/profile_item_wrapper">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/vk_text_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/vk_et"
+                    style="@style/profile_item_edit_text"
+                    android:hint="@string/user_profile.item.hint.vk"
+                    android:inputType="text"
+                    android:text="@string/user_profile.dummy.vk"
+                    android:enabled="false"
+                    android:focusable="false" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/vk_img"
+            style="@style/icon.right"
+            android:src="@drawable/ic_eye_grey_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/profile_item_divider"/>
+
+    <!-- GitHub repository -->
+    <LinearLayout style="@style/profile_item">
+
+        <ImageView
+            style="@style/icon.left"
+            android:src="@drawable/ic_github_circle_grey_24dp"/>
+
+        <LinearLayout style="@style/profile_item_wrapper">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/github_text_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/github_et"
+                    style="@style/profile_item_edit_text"
+                    android:hint="@string/user_profile.item.hint.git"
+                    android:inputType="textUri"
+                    android:text="@string/user_profile.dummy.github"
+                    android:enabled="false"
+                    android:focusable="false" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/git_img"
+            style="@style/icon.right"
+            android:src="@drawable/ic_eye_grey_24dp"/>
+
+    </LinearLayout>
+
+    <View style="@style/profile_item_divider"/>
+
+    <!-- About me -->
+    <LinearLayout style="@style/profile_item">
+
+        <ImageView
+            style="@style/icon.left"
+            android:src="@drawable/ic_account_circle_grey_24dp"/>
+
+        <LinearLayout style="@style/profile_item_wrapper">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/bio_et"
+                    style="@style/profile_item_edit_text"
+                    android:hint="@string/user_profile.item.hint.bio"
+                    android:inputType="textMultiLine"
+                    android:text="@string/user_profile.dummy.bio"
+                    android:enabled="false"
+                    android:focusable="false" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

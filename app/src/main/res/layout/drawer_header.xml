@@ -6,7 +6,7 @@
                 android:paddingLeft="@dimen/spacing_normal_16"
                 android:paddingRight="@dimen/spacing_normal_16"
                 android:paddingBottom="@dimen/spacing_small_8"
-                android:background="@drawable/header_bg">
+                android:background="@drawable/nav_header_bg">
 
     <ImageView
         android:id="@+id/avatar"
@@ -26,11 +26,11 @@
             android:id="@+id/user_name_txt"
             android:text="Трусов Владимир"
             android:fontFamily="sans-serif-medium"
-            style="@style/DrawerHeaderText"/>
+            style="@style/drawer_header_text"/>
 
         <TextView
             android:id="@+id/user_email_txt"
-            style="@style/DrawerHeaderText"
+            style="@style/drawer_header_text"
             android:fontFamily="sans-serif"
             android:text="trusov.public@gmail.com"/>
 

@@ -12,7 +12,7 @@
         android:id="@+id/main_coordinator_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        
+
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar_layout"
             android:layout_width="match_parent"
@@ -20,21 +20,56 @@
             android:background="@color/color_primary"
             android:theme="@style/AppTheme.AppBarOverlay"
             android:fitsSystemWindows="true">
-            
+
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:contentScrim="@color/color_primary"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
-                
-                <ImageView
-                    android:id="@+id/user_photo_img"
+
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/profile_image_size"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/userphoto"
-                    android:fitsSystemWindows="true" />
+                    android:fitsSystemWindows="true" >
+
+                    <ImageView
+                        android:id="@+id/user_photo_img"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/profile_image_size"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/user_bg"
+                        android:visibility="visible"/>
+
+                    <RelativeLayout
+                        android:id="@+id/profile_placeholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/grey_background"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/user_profile.placeholder.image"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_centerHorizontal="true"
+                            android:layout_above="@+id/photo_placeholder"
+                            android:layout_marginBottom="@dimen/spacing_small_8"/>
+
+                        <ImageView
+                            android:id="@+id/photo_placeholder"
+                            android:layout_width="@dimen/placeholder_photo_size_90"
+                            android:layout_height="@dimen/placeholder_photo_size_90"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/add_a_photo_48px"
+                            android:layout_centerHorizontal="true"
+                            android:layout_alignParentBottom="true"
+                            android:layout_marginBottom="@dimen/spacing_large_56"/>
+
+                    </RelativeLayout>
+
+                </FrameLayout>
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
@@ -48,266 +83,27 @@
 
         </android.support.design.widget.AppBarLayout>
 
-
-
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            app:layout_behavior=".ui.views.behaviors.ProfileScrollingViewBehavior">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <!-- User Info Section -->
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/user_info_height"
-                    android:paddingTop="@dimen/spacing_normal_16"
-                    android:paddingBottom="@dimen/spacing_normal_16"
-                    android:orientation="horizontal"
-                    android:background="@color/grey">
-
-                    <!-- Rating -->
-                    <LinearLayout
-                        style="@style/UserInfoBlock"
-                        android:layout_weight="0.24">
-
-                        <TextView
-                            android:id="@+id/user_rating_tv"
-                            style="@style/UserInfoText.Value"
-                            android:text="15"/>
-
-                        <TextView
-                            style="@style/UserInfoText"
-                            android:text="@string/user_info_rating"/>
-
-                    </LinearLayout>
-
-                    <View style="@style/UserInfoDivider" />
-
-                    <!-- Code lines -->
-                    <LinearLayout
-                        style="@style/UserInfoBlock"
-                        android:layout_weight="0.52">
-
-                        <TextView
-                            android:id="@+id/user_codelines_tv"
-                            style="@style/UserInfoText.Value"
-                            android:text="50000"/>
-
-                        <TextView
-                            style="@style/UserInfoText"
-                            android:text="@string/user_info_codelines"/>
-
-                    </LinearLayout>
-
-                    <View style="@style/UserInfoDivider" />
-
-                    <!-- Projects -->
-                    <LinearLayout
-                        style="@style/UserInfoBlock"
-                        android:layout_weight="0.24">
-
-                        <TextView
-                            android:id="@+id/user_projects_tv"
-                            style="@style/UserInfoText.Value"
-                            android:text="5"/>
-
-                        <TextView
-                            style="@style/UserInfoText"
-                            android:text="@string/user_info_projects"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-
-                <!-- User Items Section (Profile) -->
-
-                <!-- Phone -->
-                <LinearLayout style="@style/UserItemBlock">
-
-                    <ImageView
-                        style="@style/Icon.Left"
-                        android:src="@drawable/ic_call_black_24dp"/>
-
-                    <LinearLayout style="@style/UserItemTextWrapper">
-
-                        <android.support.design.widget.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <EditText
-                                android:id="@+id/phone_et"
-                                style="@style/UserItemEditText"
-                                android:hint="@string/user_item_hint_phone"
-                                android:inputType="phone"
-                                android:text="+7 (909) 4xx-xx-xx "
-                                android:enabled="false"
-                                android:focusable="false" />
-
-                        </android.support.design.widget.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/call_img"
-                        style="@style/Icon.Right"
-                        android:src="@drawable/ic_phone_in_talk_black_24dp"/>
-
-                </LinearLayout>
-
-                <View style="@style/UserItemDivider"/>
-
-                <!-- E-mail -->
-                <LinearLayout style="@style/UserItemBlock">
-
-                    <ImageView
-                        style="@style/Icon.Left"
-                        android:src="@drawable/ic_email_black_24dp"/>
-
-                    <LinearLayout style="@style/UserItemTextWrapper">
-
-                        <android.support.design.widget.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <EditText
-                                android:id="@+id/email_et"
-                                style="@style/UserItemEditText"
-                                android:hint="@string/user_item_hint_email"
-                                android:inputType="textEmailAddress"
-                                android:text="trusov.public@gmail.com"
-                                android:enabled="false"
-                                android:focusable="false" />
-
-                        </android.support.design.widget.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <ImageView
-                        style="@style/Icon.Right"
-                        android:src="@drawable/ic_send_black_24dp"/>
-
-                </LinearLayout>
-
-                <View style="@style/UserItemDivider"/>
-
-                <!-- VK profile -->
-                <LinearLayout style="@style/UserItemBlock">
-
-                    <ImageView
-                        style="@style/Icon.Left"
-                        android:src="@drawable/vk_circle_24dp"/>
-
-                    <LinearLayout style="@style/UserItemTextWrapper">
-
-                        <android.support.design.widget.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <EditText
-                                android:id="@+id/vk_et"
-                                style="@style/UserItemEditText"
-                                android:hint="@string/user_item_hint_vk"
-                                android:inputType="text"
-                                android:text="vk.com/v.a.trusov"
-                                android:enabled="false"
-                                android:focusable="false" />
-
-                        </android.support.design.widget.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <ImageView
-                        style="@style/Icon.Right"
-                        android:src="@drawable/ic_remove_red_eye_black_24dp"/>
-
-                </LinearLayout>
-
-                <View style="@style/UserItemDivider"/>
-
-                <!-- GitHub repository -->
-                <LinearLayout style="@style/UserItemBlock">
-
-                    <ImageView
-                        style="@style/Icon.Left"
-                        android:src="@drawable/github_circle_24dp"/>
-
-                    <LinearLayout style="@style/UserItemTextWrapper">
-
-                        <android.support.design.widget.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <EditText
-                                android:id="@+id/github_et"
-                                style="@style/UserItemEditText"
-                                android:hint="@string/user_item_hint_git"
-                                android:inputType="textUri"
-                                android:text="github.com/vtr-dev/DevIntensive"
-                                android:enabled="false"
-                                android:focusable="false" />
-
-                        </android.support.design.widget.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <ImageView
-                        style="@style/Icon.Right"
-                        android:src="@drawable/ic_remove_red_eye_black_24dp"/>
-
-                </LinearLayout>
-
-                <View style="@style/UserItemDivider"/>
-
-                <!-- About me -->
-                <LinearLayout style="@style/UserItemBlock">
-
-                    <ImageView
-                        style="@style/Icon.Left"
-                        android:src="@drawable/ic_account_circle_24dp"/>
-
-                    <LinearLayout style="@style/UserItemTextWrapper.Multiline">
-
-                        <android.support.design.widget.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <EditText
-                                android:id="@+id/bio_et"
-                                style="@style/UserItemEditText"
-                                android:hint="@string/user_item_hint_about"
-                                android:inputType="textMultiLine"
-                                android:text="@string/lorem_ipsum"
-                                android:enabled="false"
-                                android:focusable="false" />
-
-                        </android.support.design.widget.TextInputLayout>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </LinearLayout>
+            <include layout="@layout/user_profile_content" />
 
         </android.support.v4.widget.NestedScrollView>
-        
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_create_black_24dp"
+            android:src="@drawable/ic_create_white_24dp"
             app:layout_anchor="@id/appbar_layout"
             app:layout_anchorGravity="bottom|right"
             app:useCompatPadding="true"
             android:layout_marginRight="@dimen/fab_right_space"/>
 
     </android.support.design.widget.CoordinatorLayout>
-    
+
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation_view"
         android:layout_width="match_parent"
