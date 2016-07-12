@@ -24,7 +24,7 @@
                 android:layout_weight="0.25">
 
                 <TextView
-                    android:id="@+id/user_rating_tv"
+                    android:id="@+id/user_rating_txt"
                     style="@style/profile_header_text.value"
                     android:text="@string/user_profile.dummy.rating"/>
 
@@ -42,7 +42,7 @@
                 android:layout_weight="0.50">
 
                 <TextView
-                    android:id="@+id/user_codelines_tv"
+                    android:id="@+id/user_codelines_txt"
                     style="@style/profile_header_text.value"
                     android:text="@string/user_profile.dummy.codelines"/>
 
@@ -60,7 +60,7 @@
                 android:layout_weight="0.25">
 
                 <TextView
-                    android:id="@+id/user_projects_tv"
+                    android:id="@+id/user_projects_txt"
                     style="@style/profile_header_text.value"
                     android:text="@string/user_profile.dummy.projects"/>
 
