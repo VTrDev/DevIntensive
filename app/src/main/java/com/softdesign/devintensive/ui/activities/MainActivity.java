@@ -335,7 +335,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * @param photoFile представление файла фотографии
      */
     private void uploadPhoto(File photoFile) {
-        Call<ResponseBody> call = mDataManager.uploadPhoto(photoFile);
+        Call<ResponseBody> call = mDataManager.uploadPhoto(
+                mDataManager.getPreferencesManager().getUserId(), photoFile);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

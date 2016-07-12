@@ -57,12 +57,22 @@ public class DataManager {
         return mRestService.getImage(url);
     }
 
+    /*
     public Call<ResponseBody> uploadPhoto(File photoFile) {
         RequestBody requestBody =
                 RequestBody.create(MediaType.parse("multipart/form-data"), photoFile);
         MultipartBody.Part bodyPart =
                 MultipartBody.Part.createFormData("photo", photoFile.getName(), requestBody);
         return mRestService.uploadImage(bodyPart);
+    }
+    */
+
+    public Call<ResponseBody> uploadPhoto(String userId, File photoFile) {
+        RequestBody requestBody =
+                RequestBody.create(MediaType.parse("multipart/form-data"), photoFile);
+        MultipartBody.Part bodyPart =
+                MultipartBody.Part.createFormData("photo", photoFile.getName(), requestBody);
+        return mRestService.uploadPhoto(userId, bodyPart);
     }
 
     //endregion
