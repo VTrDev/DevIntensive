@@ -43,9 +43,9 @@ public class ValidateHelper {
             StringBuilder phoneBuilder = new StringBuilder();
 
             phoneBuilder.append(phoneStrNorm.substring(0, 2));
-            phoneBuilder.append(" ");
+            phoneBuilder.append(" (");
             phoneBuilder.append(phoneStrNorm.substring(2, 5));
-            phoneBuilder.append(" ");
+            phoneBuilder.append(") ");
             phoneBuilder.append(phoneStrNorm.substring(5, 8));
             phoneBuilder.append("-");
             phoneBuilder.append(phoneStrNorm.substring(8, 10));

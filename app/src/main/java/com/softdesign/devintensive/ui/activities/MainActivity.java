@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -46,6 +48,7 @@ import com.softdesign.devintensive.utils.ValidateHelper;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,6 +58,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -63,14 +70,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private DataManager mDataManager;
     private int mCurrentEditMode = ConstantManager.EDIT_MODE_OFF;
 
-    @BindView(R.id.main_coordinator_container) CoordinatorLayout mCoordinatorLayout;
-    @BindView(R.id.toolbar) Toolbar mToolbar;
-    @BindView(R.id.navigation_drawer) DrawerLayout mNavigationDrawer;
-    @BindView(R.id.navigation_view) NavigationView mNavigationView;
-    @BindView(R.id.fab) FloatingActionButton mFab;
+    @BindView(R.id.main_coordinator_container)
+    CoordinatorLayout mCoordinatorLayout;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.navigation_drawer)
+    DrawerLayout mNavigationDrawer;
+    @BindView(R.id.navigation_view)
+    NavigationView mNavigationView;
+    @BindView(R.id.fab)
+    FloatingActionButton mFab;
     @BindView(R.id.profile_placeholder) RelativeLayout mProfilePlaceholder;
-    @BindView(R.id.collapsing_toolbar) CollapsingToolbarLayout mCollapsingToolbar;
-    @BindView(R.id.appbar_layout) AppBarLayout mAppBarLayout;
+    @BindView(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout mCollapsingToolbar;
+    @BindView(R.id.appbar_layout)
+    AppBarLayout mAppBarLayout;
     @BindView(R.id.user_photo_img) ImageView mProfileImage;
 
     @BindView(R.id.call_img) ImageView mCallImg;
@@ -84,18 +98,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @BindView(R.id.github_et) EditText mUserGit;
     @BindView(R.id.bio_et) EditText mUserBio;
 
-    @BindView(R.id.phone_text_layout) TextInputLayout mUserPhoneLayout;
-    @BindView(R.id.email_text_layout) TextInputLayout mUserMailLayout;
-    @BindView(R.id.vk_text_layout) TextInputLayout mUserVkLayout;
-    @BindView(R.id.github_text_layout) TextInputLayout mUserGitLayout;
-
-    @BindView(R.id.user_rating_tv) TextView mUserRating;
-    @BindView(R.id.user_codelines_tv) TextView mUserCodeLines;
-    @BindView(R.id.user_projects_tv) TextView mUserProjects;
+    @BindView(R.id.phone_text_layout)
+    TextInputLayout mUserPhoneLayout;
+    @BindView(R.id.email_text_layout)
+    TextInputLayout mUserMailLayout;
+    @BindView(R.id.vk_text_layout)
+    TextInputLayout mUserVkLayout;
+    @BindView(R.id.github_text_layout)
+    TextInputLayout mUserGitLayout;
 
     // в данном случае не лучший вариант (возможно инициирует повторный findById)
     @BindViews({R.id.phone_et, R.id.email_et, R.id.vk_et, R.id.github_et, R.id.bio_et})
     List<EditText> mUserInfoViews;
+
+    @BindView(R.id.user_rating_txt) TextView mUserValueRating;
+    @BindView(R.id.user_codelines_txt) TextView mUserValueCodeLines;
+    @BindView(R.id.user_projects_txt) TextView mUserValueProjects;
+
+    @BindViews({R.id.user_rating_txt, R.id.user_codelines_txt, R.id.user_projects_txt})
+    List<TextView> mUserValueViews;
 
     private AppBarLayout.LayoutParams mAppBarParams = null;
     private File mPhotoFile = null;
@@ -121,11 +142,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         setupToolbar();
         setupDrawer();
-        loadUserInfoValues();
-        Picasso.with(this)
-                .load(mDataManager.getPreferencesManager().loadUserPhoto())
-                .placeholder(R.drawable.user_bg)
-                .into(mProfileImage);
+        initUserFields();
+        initUserInfoValues();
+
+        initProfileImage();
 
         if (savedInstanceState == null) {
             // активность запускается впервые
@@ -164,7 +184,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         Log.d(TAG, "onPause");
 
         if (validateUserInfoValues(false)) {
-            saveUserInfoValues();
+            saveUserFields();
         }
     }
 
@@ -268,11 +288,85 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     /**
+     * Выполняет инициализацию фотографии в профиле пользователя.
+     * Загружает фотографию с сервера. В случае неудачи использует локальное изображение.
+     */
+    private void initProfileImage() {
+        String photoURL = getIntent().getStringExtra(ConstantManager.USER_PHOTO_URL_KEY);
+        final Uri photoLocalUri = mDataManager.getPreferencesManager().loadUserPhoto();
+
+        Picasso.with(MainActivity.this)
+                .load(photoLocalUri)
+                .placeholder(R.drawable.user_bg)
+                .into(mProfileImage);
+
+        Call<ResponseBody> call = mDataManager.getImage(photoURL);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
+                    if (bitmap != null) {
+                        mProfileImage.setImageBitmap(bitmap);
+                        try {
+                            File file = createImageFileFromBitmap("user_photo", bitmap);
+                            if (file != null) {
+                                mDataManager.getPreferencesManager()
+                                        .saveUserPhoto(Uri.fromFile(file));
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                showShackbar("Не удалось загрузить фотографию пользователя");
+            }
+        });
+    }
+
+
+    /**
+     * Загружает фотографию из профиля пользователя на сервер
+     * @param photoFile представление файла фотографии
+     */
+    private void uploadPhoto(File photoFile) {
+        Call<ResponseBody> call = mDataManager.uploadPhoto(
+                mDataManager.getPreferencesManager().getUserId(), photoFile);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d("TAG", "Upload success");
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                showShackbar("Не удалось загрузить фотографию на сервер");
+                //Log.e("Upload error", t.getMessage());
+            }
+        });
+    }
+
+    /**
      * Выполняет инициализацию выдвижной панели навигационного меню
      */
     private void setupDrawer() {
         if (mNavigationView != null) {
-            updateAvatar(BitmapFactory.decodeResource(getResources(), R.drawable.avatar_60));
+
+            View headerView = mNavigationView.getHeaderView(0);
+
+            List<String> userNames = mDataManager.getPreferencesManager().loadUserName();
+            ((TextView)headerView.findViewById(R.id.user_name_txt))
+                    .setText(String.format("%s %s", userNames.get(1), userNames.get(0)));
+            ((TextView)headerView.findViewById(R.id.user_email_txt))
+                    .setText(mUserMail.getText());
+
+            updateAvatar();
+
             mNavigationView.setNavigationItemSelectedListener(
                     new NavigationView.OnNavigationItemSelectedListener() {
                         @Override
@@ -287,16 +381,60 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     /**
-     * Изменяет изображение аватара на выдвижной панеле
-     * @param bitmap битовая карта графического изображения
+     * Изменяет аватар пользователя на выдвижной панеле
+     * Загружает аватар с сервера. В случае неудачи использует локальное изображение.
      */
-    public void updateAvatar(Bitmap bitmap) {
-        ImageView avatarImg = (ImageView)
+    public void updateAvatar() {
+
+        final ImageView avatarImg = (ImageView)
                 mNavigationView.getHeaderView(0).findViewById(R.id.avatar);
-        RoundedAvatarDrawable avatarDrawable = new RoundedAvatarDrawable(bitmap);
-        avatarDrawable.setAntiAlias(true);
-        avatarImg.setImageDrawable(avatarDrawable);
+
+        String avatarUrl = getIntent().getStringExtra(ConstantManager.USER_AVATAR_URL_KEY);
+        Uri avatarLocalUri = mDataManager.getPreferencesManager().loadUserAvatar();
+
+        // TODO: 12.07.2016 Разобраться с скруглением
+//        Picasso.with(this)
+//                .load(avatarLocalUri)
+//                .placeholder(R.drawable.no_avatar)
+//                .into(avatarImg);
+//
+//        RoundedAvatarDrawable avatarDrawable = new RoundedAvatarDrawable(
+//                ((BitmapDrawable)avatarImg.getDrawable()).getBitmap());
+//        avatarDrawable.setAntiAlias(true);
+//        avatarImg.setImageDrawable(avatarDrawable);
+
+        Call<ResponseBody> call = mDataManager.getImage(avatarUrl);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
+                    if (bitmap != null) {
+                        RoundedAvatarDrawable avatarDrawable = new RoundedAvatarDrawable(bitmap);
+                        avatarDrawable.setAntiAlias(true);
+                        avatarImg.setImageDrawable(avatarDrawable);
+                        try {
+                            File file = createImageFileFromBitmap("user_avatar", bitmap);
+                            if (file != null) {
+                                mDataManager.getPreferencesManager()
+                                        .saveUserAvatar(Uri.fromFile(file));
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                showShackbar("Не удалось загрузить аватар пользователя");
+            }
+        });
+
     }
+
 
     /**
      * Получение результата из другой Activity (фото из камеры или галлереи)
@@ -356,7 +494,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             unlockToolbar();
             mCollapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.white));
 
-            saveUserInfoValues();
+            saveUserFields();
         }
     }
 
@@ -434,9 +572,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     /**
-     * Загружает пользовательские данные
+     * Загружает пользовательские данные в поля профайла
      */
-    private void loadUserInfoValues() {
+    private void initUserFields() {
         List<String> userData = mDataManager.getPreferencesManager().loadUserProfileData();
         for (int i = 0; i < userData.size(); i++) {
             mUserInfoViews.get(i).setText(userData.get(i));
@@ -444,14 +582,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     /**
-     * Сохраняет пользовательские данные
+     * Сохраняет пользовательские данные, введенные в поля профайла
      */
-    private void saveUserInfoValues() {
+    private void saveUserFields() {
         List<String> userData = new ArrayList<>();
         for (EditText userFieldView : mUserInfoViews) {
             userData.add(userFieldView.getText().toString());
         }
         mDataManager.getPreferencesManager().saveUserProfileData(userData);
+    }
+
+    /**
+     * Загружает данные пользователя (рейтинг, строки кода, проекта) из Shared Preferences
+     * в текстовые поля заголовка профиля
+     */
+    private void initUserInfoValues() {
+        List<String> userData = mDataManager.getPreferencesManager().loadUserProfileValues();
+        for (int i = 0; i < userData.size(); i++) {
+            mUserValueViews.get(i).setText(userData.get(i));
+        }
     }
 
     /**
@@ -591,6 +740,63 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+
+    /**
+     * Создает файл с для хранения изображения во внешнем хранилище
+     * @param imageFileName имя файла
+     * @param bitmap растровое изображение для сохранения в файле
+     * @return представление созданного файла изображения
+     * @throws IOException
+     */
+    private File createImageFileFromBitmap(String imageFileName, Bitmap bitmap) throws IOException {
+
+        // проверка разрешений для Android 6
+        if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+
+            File storageDir = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES);
+            File imageFile = null;
+            try {
+                imageFile = new File(storageDir, imageFileName + ".jpg");
+
+                FileOutputStream fos = new FileOutputStream(imageFile);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos);
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // Android 6 ???: сохранение изображения с добавлением в галлерею
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+            values.put(MediaStore.MediaColumns.DATA, imageFile.getAbsolutePath());
+
+            this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+            return imageFile;
+        } else {
+            // запрос разрешений на использование камеры и внешнего хранилища данных
+            ActivityCompat.requestPermissions(this, new String[] {
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            }, ConstantManager.CAMERA_REQUEST_PERMISSION_CODE);
+
+            // предоставление пользователю возможности установить разрешения,
+            // если он ранее запретил их и выбрал опцию "не показывать больше"
+            Snackbar.make(mCoordinatorLayout, R.string.snackbar_msg_permissions_request, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.action_allow_permissions, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            openApplicationSettings();
+                        }
+                    }).show();
+
+            return null;
+        }
+
+    }
+
     /**
      * Создает файл с уникальным именем для хранения фотографии во внешнем хранилище
      * @return объект {@link File} для созданного файла
@@ -616,15 +822,49 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     /**
-     * Помещает в профайл изображение с заданным URI, сохраняет URI в Shared Preferences
+     * Помещает в профиль пользователя фотографию с заданным URI,
+     * сохраняет URI фотографии в Shared Preferences,
+     * загружает фотографию на сервер, если URI изменился
      * @param selectedImage URI изображения
      */
     private void insertProfileImage(Uri selectedImage) {
+
         Picasso.with(this)
                 .load(selectedImage)
                 .into(mProfileImage);
 
-        mDataManager.getPreferencesManager().saveUserPhoto(selectedImage);
+        // если URI фотографии изменился
+        if (! selectedImage.equals(mDataManager.getPreferencesManager().loadUserPhoto())) {
+
+            if (selectedImage.getLastPathSegment().endsWith(".jpg")) {
+                uploadPhoto(new File(selectedImage.getPath()));
+            } else {
+                uploadPhoto(new File(getPath(selectedImage)));
+            }
+
+            mDataManager.getPreferencesManager().saveUserPhoto(selectedImage);
+        }
+
+    }
+
+    /**
+     * Возвращает путь к файлу для заданного URI
+     * (используется для корректной выгрузки на сервер при выборе файла в галерее)
+     * @param uri URI файла
+     * @return путь к файлу
+     */
+    @Nullable
+    private String getPath(Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor == null) {
+            return null;
+        }
+        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(columnIndex);
+        cursor.close();
+        return path;
     }
 
     /**
@@ -666,9 +906,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void setUserProfileDummyValues() {
-        mUserRating.setText(getString(R.string.user_profile_dummy_rating));
-        mUserCodeLines.setText(getString(R.string.user_profile_dummy_codelines));
-        mUserProjects.setText(getString(R.string.user_profile_dummy_projects));
+        mUserValueRating.setText(getString(R.string.user_profile_dummy_rating));
+        mUserValueCodeLines.setText(getString(R.string.user_profile_dummy_codelines));
+        mUserValueProjects.setText(getString(R.string.user_profile_dummy_projects));
         mUserPhone.setText(getString(R.string.user_profile_dummy_phone));
         mUserMail.setText(getString(R.string.user_profile_dummy_email));
         mUserVk.setText(getString(R.string.user_profile_dummy_vk));

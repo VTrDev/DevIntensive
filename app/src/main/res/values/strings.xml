@@ -1,4 +1,8 @@
 <resources>
+    <!-- Font Family -->
+    <string name="ff_regular">sans-serif</string>
+    <string name="ff_medium">sans-serif-medium</string>
+
     <string name="app_name">Трусов Владимир</string>
     <string name="user_profile.header.rating">Рейтинг</string>
     <string name="user_profile.header.codelines">Написано строк кода</string>
@@ -9,22 +13,18 @@
     <string name="user_profile.item.hint.git">Репозиторий</string>
     <string name="user_profile.item.hint.bio">О себе</string>
     <string name="user_profile.placeholder.image">Изменить фотографию профиля</string>
-    <string name="user_profile.dialog.gallery">Загрузить из галлереи</string>
+    <string name="user_profile.dialog.gallery">Загрузить из галереи</string>
     <string name="user_profile.dialog.camera">Сделать снимок</string>
     <string name="user_profile.dialog.cancel">Отмена</string>
     <string name="user_profile.dialog.title">Изменить фотографию профиля</string>
     <string name="user_profile.chose.message">выберите фото</string>
+    <string name="user_profile.empty_bio">Этот пользователь пока о себе ничего не написал...</string>
     <string name="validation.msg.phone">Введите номер телефона в формате\n +x xxx xxx-xx-xx (от 11 до 20 цифр)</string>
     <string name="validation.msg.email">Недопустимый адрес электронной почты</string>
     <string name="validation.msg.vk">Адрес аккаунта VK должен иметь формат vk.com/ххх</string>
     <string name="validation.msg.git">Адрес аккаунта GitHub должен иметь формат github.com/ххх</string>
     <string name="snackbar_msg.edit_on">Редактирование включено</string>
     <string name="snackbar_msg.data_saved">Данные сохранены</string>
-    <string name="user_auth.title">ВОЙТИ</string>
-    <string name="user_auth.email_hint">E-mail</string>
-    <string name="user_auth.password_hint">Пароль</string>
-    <string name="user_auth.login_button">Войти</string>
-    <string name="user_auth.forgot_password">Забыли пароль?</string>
     <string name="chooser_title.send_mail">Отправить письмо</string>
     <string name="snackbar_msg.permissions_request">Для корректной работы приложения необходимо дать требуемые разрешения</string>
     <string name="action.allow_permissions">Разрешить</string>
@@ -37,4 +37,13 @@
     <string name="user_profile.dummy.vk">vk.com/v.a.trusov</string>
     <string name="user_profile.dummy.github">github.com/vtr-dev/DevIntensive</string>
     <string name="user_profile.dummy.bio">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
+
+    <!-- AuthActivity -->
+    <string name="auth.authorization_enter">Войти</string>
+    <string name="auth.email">Введите E-mail</string>
+    <string name="auth.password">Введите пароль</string>
+    <string name="auth.login">Войти</string>
+    <string name="auth.remember">Забыли пароль?</string>
+
+
 </resources>

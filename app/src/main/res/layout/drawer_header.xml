@@ -12,8 +12,7 @@
         android:id="@+id/avatar"
         android:layout_width="@dimen/avatar_size"
         android:layout_height="@dimen/avatar_size"
-        android:layout_marginTop="@dimen/spacing_normal_16"
-        android:src="@drawable/avatar_60"/>
+        android:layout_marginTop="@dimen/spacing_normal_16"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,15 +23,13 @@
 
         <TextView
             android:id="@+id/user_name_txt"
-            android:text="Трусов Владимир"
             android:fontFamily="sans-serif-medium"
-            style="@style/drawer_header_text"/>
+            style="@style/drawer_header_text" />
 
         <TextView
             android:id="@+id/user_email_txt"
             style="@style/drawer_header_text"
-            android:fontFamily="sans-serif"
-            android:text="trusov.public@gmail.com"/>
+            android:fontFamily="sans-serif" />
 
     </LinearLayout>
 
