@@ -26,6 +26,7 @@
     <dimen name="placeholder_photo_size_90">90dp</dimen>
 
     <!-- fonts -->
+    <dimen name="font_large_24">24sp</dimen>
     <dimen name="font_medium_20">20sp</dimen>
     <dimen name="font_small_14">14sp</dimen>
 </resources>

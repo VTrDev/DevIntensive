@@ -137,11 +137,13 @@ public class UserModelRes {
         }
 
         public String getAvatar() {
-            return avatar;
+            // fixes Picasso error
+            return avatar.isEmpty() ? null : avatar;
         }
 
         public String getPhoto() {
-            return photo;
+            // fixes Picasso error
+            return photo.isEmpty() ? null : photo;
         }
     }
 
