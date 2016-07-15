@@ -85,8 +85,9 @@ public class ProfileUserActivity extends BaseActivity {
 
         mCollapsingToolbarLayout.setTitle(userDTO.getFullName());
 
+        String photoUrl = userDTO.getPhoto();
         Picasso.with(this)
-                .load(userDTO.getPhoto())
+                .load(photoUrl.isEmpty() ? null : photoUrl)
                 .placeholder(R.drawable.user_bg)
                 .error(R.drawable.user_bg)
                 .into(mProfileImage);

@@ -1,11 +1,13 @@
 package com.softdesign.devintensive.ui.adapters;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -22,6 +24,9 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
     private List<UserListRes.UserData> mUsers;
     private UserViewHolder.CustomClickListener mCustomClickListener;
 
+    private int photoApprxWidth, photoApprxHeight;
+    boolean photoDimensCalculated = false;
+
     public UsersAdapter(List<UserListRes.UserData> users,
                         UserViewHolder.CustomClickListener customClickListener) {
         mUsers = users;
@@ -34,6 +39,8 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         View convertView = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_user_list, parent, false);
 
+        calcApprxPhotoDimens();
+
         return new UserViewHolder(convertView, mCustomClickListener);
     }
 
@@ -41,8 +48,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
     public void onBindViewHolder(UsersAdapter.UserViewHolder holder, int position) {
         UserListRes.UserData user = mUsers.get(position);
 
+        String photoUrl = user.getPublicInfo().getPhoto();
         Picasso.with(mContext)
-                .load(user.getPublicInfo().getPhoto())
+                .load(photoUrl.isEmpty() ? null : photoUrl)
+                .resize(photoApprxWidth / 2, photoApprxHeight / 2)
+                .centerCrop()
                 .placeholder(mContext.getResources().getDrawable(R.drawable.user_bg))
                 .error(mContext.getResources().getDrawable(R.drawable.user_bg))
                 .into(holder.userPhoto);
@@ -65,6 +75,21 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         return mUsers.size();
     }
 
+    private int getScreenWidth() {
+        WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return size.x;
+    }
+
+    private void calcApprxPhotoDimens() {
+        if (!photoDimensCalculated) {
+            photoApprxWidth = getScreenWidth();
+            photoApprxHeight = (int) (photoApprxWidth / 1.78);
+            photoDimensCalculated = true;
+        }
+    }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
