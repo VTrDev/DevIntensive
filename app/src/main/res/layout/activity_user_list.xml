@@ -32,6 +32,24 @@
 
         </android.support.design.widget.AppBarLayout>
 
+        <android.support.v7.widget.CardView
+            android:id="@+id/search_card"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/spacing_large_56"
+            app:cardBackgroundColor="@color/grey_background_trans"
+            app:cardCornerRadius="0dp"
+            android:visibility="gone">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/search_suggests_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/spacing_normal_16"
+                android:paddingRight="@dimen/spacing_normal_16"/>
+
+        </android.support.v7.widget.CardView>
+
         <include layout="@layout/user_list_content"/>
 
     </android.support.design.widget.CoordinatorLayout>

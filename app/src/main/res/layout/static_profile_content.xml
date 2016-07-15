@@ -76,8 +76,10 @@
 
     <!-- User Profile Items -->
 
-    <!-- GitHub repository -->
-    <LinearLayout style="@style/profile_item">
+    <!-- GitHub repositories -->
+    <LinearLayout
+        android:id="@+id/repositories_wrapper"
+        style="@style/profile_item">
 
         <ImageView
             style="@style/icon.left"
@@ -88,11 +90,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/spacing_medium_32"/>
-
-        <ImageView
-            android:id="@+id/git_img"
-            style="@style/icon.right"
-            android:src="@drawable/ic_eye_grey_24dp"/>
 
     </LinearLayout>
 

@@ -1,5 +1,7 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -7,10 +9,14 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -69,12 +75,16 @@ public class ProfileUserActivity extends BaseActivity {
         final RepositoriesAdapter repositoriesAdapter = new RepositoriesAdapter(this, repositories);
         mRepoListView.setAdapter(repositoriesAdapter);
 
+        // ХАК: установка высоты ListView по элементам
+        setListViewHeightBasedOnItems(mRepoListView);
+
+
         mRepoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO: 14.07.2016 Реализовать просмотр репозитория по Intent.ACTION_VIEW
-                Snackbar.make(mCollapsingToolbarLayout,
-                        "Репозиторий " + repositories.get(position), Snackbar.LENGTH_LONG).show();
+                Intent browseIntent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://" + repositories.get(position)));
+                startActivity(browseIntent);
             }
         });
 
@@ -92,4 +102,44 @@ public class ProfileUserActivity extends BaseActivity {
                 .error(R.drawable.user_bg)
                 .into(mProfileImage);
     }
+
+    /**
+     * Sets ListView height dynamically based on the height of the items.
+     *
+     * @param listView to be resized
+     * @return true if the listView is successfully resized, false otherwise
+     */
+    public static boolean setListViewHeightBasedOnItems(ListView listView) {
+
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter != null) {
+
+            int numberOfItems = listAdapter.getCount();
+
+            // Get total height of all items.
+            int totalItemsHeight = 0;
+            for (int itemPos = 0; itemPos < numberOfItems; itemPos++) {
+                View item = listAdapter.getView(itemPos, null, listView);
+                item.measure(0, 0);
+                totalItemsHeight += item.getMeasuredHeight();
+            }
+
+            // Get total height of all item dividers.
+            int totalDividersHeight = listView.getDividerHeight() *
+                    (numberOfItems - 1);
+
+            // Set list height.
+            ViewGroup.LayoutParams params = listView.getLayoutParams();
+            params.height = totalItemsHeight + totalDividersHeight;
+            listView.setLayoutParams(params);
+            listView.requestLayout();
+
+            return true;
+
+        } else {
+            return false;
+        }
+
+    }
+
 }

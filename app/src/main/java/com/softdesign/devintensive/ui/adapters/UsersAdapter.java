@@ -60,6 +60,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         holder.mFullName.setText(user.getFullName());
         holder.mRating.setText(String.valueOf(user.getProfileValues().getRating()));
         holder.mCodeLines.setText(String.valueOf(user.getProfileValues().getLinesCode()));
+        holder.mProjects.setText(String.valueOf(user.getProfileValues().getProjects()));
 
         if (user.getPublicInfo().getBio() == null || user.getPublicInfo().getBio().isEmpty()) {
             holder.mBio.setVisibility(View.GONE);
