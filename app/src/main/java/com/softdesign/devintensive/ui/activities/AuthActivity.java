@@ -53,6 +53,8 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
+        mLogin.setText("trusov.public@gmail.com");
+        mPassword.setText("sd1102010");
     }
 
     @Override

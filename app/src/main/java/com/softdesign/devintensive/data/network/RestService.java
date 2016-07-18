@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.data.network;
 
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
+import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
 
 import okhttp3.MultipartBody;
@@ -22,17 +23,16 @@ public interface RestService {
     @POST("login")
     Call<UserModelRes> loginUser(@Body UserLoginReq req);
 
-    /*
-    @Multipart
-    @POST("profile/edit")
-    Call<ResponseBody> uploadImage(@Part MultipartBody.Part file);
-    */
+    @GET
+    Call<ResponseBody> getImage(@Url String url);
 
     @Multipart
     @POST("user/{userId}/publicValues/profilePhoto")
-    Call<ResponseBody> uploadPhoto(@Path("userId") String userId, @Part MultipartBody.Part file);
+    Call<ResponseBody> uploadPhoto(@Path("userId") String userId,
+                                   @Part MultipartBody.Part file);
+    // TODO: 14.07.2016 переделать на Call<UploadPhotoRes> uploadPhoto(...)
 
-    @GET
-    Call<ResponseBody> getImage(@Url String url);
+    @GET("user/list?orderBy=rating")
+    Call<UserListRes> getUserList();
 
 }
