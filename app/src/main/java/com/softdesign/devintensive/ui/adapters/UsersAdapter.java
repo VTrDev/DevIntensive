@@ -1,33 +1,34 @@
 package com.softdesign.devintensive.ui.adapters;
 
 import android.content.Context;
-import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
-import android.view.Display;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
-import com.softdesign.devintensive.data.network.res.UserListRes;
+import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.storage.models.User;
 import com.softdesign.devintensive.ui.views.AspectRatioImageView;
-import com.squareup.picasso.Picasso;
+import com.softdesign.devintensive.utils.ConstantManager;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 
 import java.util.List;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder> {
 
+    private static final String TAG = ConstantManager.TAG_PREFIX + " UsersAdapter";
+
     private Context mContext;
-    private List<UserListRes.UserData> mUsers;
+    private List<User> mUsers;
     private UserViewHolder.CustomClickListener mCustomClickListener;
 
-    private int photoApprxWidth, photoApprxHeight;
-    boolean photoDimensCalculated = false;
-
-    public UsersAdapter(List<UserListRes.UserData> users,
+    public UsersAdapter(List<User> users,
                         UserViewHolder.CustomClickListener customClickListener) {
         mUsers = users;
         this.mCustomClickListener = customClickListener;
@@ -39,34 +40,65 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         View convertView = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_user_list, parent, false);
 
-        calcApprxPhotoDimens();
-
         return new UserViewHolder(convertView, mCustomClickListener);
     }
 
     @Override
-    public void onBindViewHolder(UsersAdapter.UserViewHolder holder, int position) {
-        UserListRes.UserData user = mUsers.get(position);
+    public void onBindViewHolder(final UsersAdapter.UserViewHolder holder, int position) {
+        final User user = mUsers.get(position);
+        final String userPhoto;
+        if (user.getPhoto().isEmpty()) {
+            userPhoto = null;
+            Log.e(TAG, "onBindViewHolder: user with name " + user.getFullName() + " has empty photo");
+        } else {
+            userPhoto = user.getPhoto();
+        }
 
-        String photoUrl = user.getPublicInfo().getPhoto();
-        Picasso.with(mContext)
-                .load(photoUrl.isEmpty() ? null : photoUrl)
-                .resize(photoApprxWidth / 2, photoApprxHeight / 2)
+        // пытаемся загрузить изображение из дискового кеша
+        DataManager.getInstance().getPicasso()
+                .load(userPhoto)
+                .error(holder.mDummy)
+                .placeholder(holder.mDummy)
+                .fit()
                 .centerCrop()
-                .placeholder(mContext.getResources().getDrawable(R.drawable.user_bg))
-                .error(mContext.getResources().getDrawable(R.drawable.user_bg))
-                .into(holder.userPhoto);
+                .networkPolicy(NetworkPolicy.OFFLINE) // добавляем политику кеширования (сначала пытаемся извлечь изображение из кеша)
+                .into(holder.userPhoto, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, " load from cache");
+                    }
+
+                    @Override
+                    public void onError() {
+                        // если не удалось загрузить изображение из кеша, пытаемся загрузить из сети
+                        DataManager.getInstance().getPicasso()
+                                .load(userPhoto)
+                                .error(holder.mDummy)
+                                .placeholder(holder.mDummy)
+                                .fit()
+                                .centerCrop()
+                                .into(holder.userPhoto, new Callback() {
+                                    @Override
+                                    public void onSuccess() {}
+
+                                    @Override
+                                    public void onError() {
+                                        Log.d(TAG, "Could not fetch image");
+                                    }
+                                });
+                    }
+                });
 
         holder.mFullName.setText(user.getFullName());
-        holder.mRating.setText(String.valueOf(user.getProfileValues().getRating()));
-        holder.mCodeLines.setText(String.valueOf(user.getProfileValues().getLinesCode()));
-        holder.mProjects.setText(String.valueOf(user.getProfileValues().getProjects()));
+        holder.mRating.setText(String.valueOf(user.getRating()));
+        holder.mCodeLines.setText(String.valueOf(user.getCodeLines()));
+        holder.mProjects.setText(String.valueOf(user.getProjects()));
 
-        if (user.getPublicInfo().getBio() == null || user.getPublicInfo().getBio().isEmpty()) {
+        if (user.getBio() == null || user.getBio().isEmpty()) {
             holder.mBio.setVisibility(View.GONE);
         } else {
             holder.mBio.setVisibility(View.VISIBLE);
-            holder.mBio.setText(user.getPublicInfo().getBio());
+            holder.mBio.setText(user.getBio());
         }
         holder.mFullName.setText(user.getFullName());
     }
@@ -76,30 +108,14 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         return mUsers.size();
     }
 
-    private int getScreenWidth() {
-        WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        return size.x;
-    }
-
-    private void calcApprxPhotoDimens() {
-        if (!photoDimensCalculated) {
-            photoApprxWidth = getScreenWidth();
-            photoApprxHeight = (int) (photoApprxWidth / 1.78);
-            photoDimensCalculated = true;
-        }
-    }
-
     public static class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         protected AspectRatioImageView userPhoto;
         protected TextView mFullName, mRating, mCodeLines, mProjects, mBio;
         protected Button mShowMore;
+        protected Drawable mDummy;
 
         private CustomClickListener mListener;
-
 
         public UserViewHolder(View itemView, CustomClickListener customClickListener) {
             super(itemView);
@@ -113,6 +129,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
             mBio = (TextView) itemView.findViewById(R.id.bio_txt);
             mShowMore = (Button) itemView.findViewById(R.id.more_info_btn);
 
+            mDummy = userPhoto.getContext().getResources().getDrawable(R.drawable.user_bg);
             mShowMore.setOnClickListener(this);
         }
 

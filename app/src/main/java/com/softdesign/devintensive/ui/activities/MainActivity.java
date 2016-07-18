@@ -149,7 +149,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         if (savedInstanceState == null) {
             // активность запускается впервые
-            // setUserProfileDummyValues();
         } else {
             // активность уже создавалась
             mCurrentEditMode = savedInstanceState
@@ -359,7 +358,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             View headerView = mNavigationView.getHeaderView(0);
 
-            List<String> userNames = mDataManager.getPreferencesManager().loadUserName();
+            List<String> userNames = mDataManager.getPreferencesManager().loadUserFullName();
             ((TextView)headerView.findViewById(R.id.user_name_txt))
                     .setText(String.format("%s %s", userNames.get(1), userNames.get(0)));
             ((TextView)headerView.findViewById(R.id.user_email_txt))
@@ -903,17 +902,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void browseUrl(String url) {
         Intent browseIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browseIntent);
-    }
-
-    private void setUserProfileDummyValues() {
-        mUserValueRating.setText(getString(R.string.user_profile_dummy_rating));
-        mUserValueCodeLines.setText(getString(R.string.user_profile_dummy_codelines));
-        mUserValueProjects.setText(getString(R.string.user_profile_dummy_projects));
-        mUserPhone.setText(getString(R.string.user_profile_dummy_phone));
-        mUserMail.setText(getString(R.string.user_profile_dummy_email));
-        mUserVk.setText(getString(R.string.user_profile_dummy_vk));
-        mUserGit.setText(getString(R.string.user_profile_dummy_github));
-        mUserBio.setText(getString(R.string.user_profile_dummy_bio));
     }
 
 }
