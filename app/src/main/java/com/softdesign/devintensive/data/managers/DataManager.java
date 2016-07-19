@@ -104,8 +104,9 @@ public class DataManager {
 
         try {
             userList = mDaoSession.queryBuilder(User.class)
-                    .where(UserDao.Properties.CodeLines.gt(0))
-                    .orderDesc(UserDao.Properties.CodeLines)
+                    //.where(UserDao.Properties.CodeLines.gt(0))
+                    //.orderDesc(UserDao.Properties.CodeLines)
+                    .orderAsc(UserDao.Properties.Position)
                     .build()
                     .list();
         } catch (Exception e) {

@@ -44,12 +44,16 @@ public class User {
 
     private String bio;
 
+    @NotNull
+    @Unique
+    private int position;
+
     @ToMany(joinProperties = {
             @JoinProperty(name = "remoteId", referencedName = "userRemoteId")
     })
     private List<Repository> repositories;
 
-    public User(UserListRes.UserData userRes) {
+    public User(UserListRes.UserData userRes, int position) {
         this.remoteId = userRes.getId();
         this.photo = userRes.getPublicInfo().getPhoto();
         this.fullName = userRes.getFullName();
@@ -58,6 +62,7 @@ public class User {
         this.codeLines = userRes.getProfileValues().getLinesCode();
         this.projects = userRes.getProfileValues().getProjects();
         this.bio = userRes.getPublicInfo().getBio();
+        this.position = position;
     }
 
     /**
@@ -215,9 +220,18 @@ public class User {
         this.photo = photo;
     }
 
-    @Generated(hash = 1023608416)
+    public int getPosition() {
+        return this.position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    @Generated(hash = 2125324806)
     public User(Long id, @NotNull String remoteId, String photo, @NotNull String fullName,
-            @NotNull String searchName, int rating, int codeLines, int projects, String bio) {
+            @NotNull String searchName, int rating, int codeLines, int projects, String bio,
+            int position) {
         this.id = id;
         this.remoteId = remoteId;
         this.photo = photo;
@@ -227,6 +241,7 @@ public class User {
         this.codeLines = codeLines;
         this.projects = projects;
         this.bio = bio;
+        this.position = position;
     }
 
     @Generated(hash = 586692638)

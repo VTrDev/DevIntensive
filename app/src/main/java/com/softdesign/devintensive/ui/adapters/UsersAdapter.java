@@ -18,6 +18,7 @@ import com.softdesign.devintensive.utils.ConstantManager;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 
+import java.util.Collections;
 import java.util.List;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder> {
@@ -106,6 +107,33 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
     @Override
     public int getItemCount() {
         return mUsers.size();
+    }
+
+    /**
+     * Удаляет элемент из списка
+     * @param position позиция элемента в списке
+     */
+    public void remove(int position) {
+        mUsers.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    /**
+     * Меняет два элемента списка местами
+     * @param firstPos позиция первого элемента списка
+     * @param secondPos позиция второго элемента списка
+     */
+    public void swap(int firstPos, int secondPos) {
+        Collections.swap(mUsers, firstPos, secondPos);
+        notifyItemMoved(firstPos, secondPos);
+    }
+
+    /**
+     * Возвращает список элементов (текушее состояние списка)
+     * @return список элементов
+     */
+    public List<User> getUsers() {
+        return mUsers;
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

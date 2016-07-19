@@ -16,6 +16,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,12 +33,16 @@ import com.softdesign.devintensive.ui.adapters.UsersAdapter;
 import com.softdesign.devintensive.utils.ConstantManager;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class UserListActivity extends BaseActivity implements LoaderManager.LoaderCallbacks {
 
     private static final String TAG = ConstantManager.TAG_PREFIX + " UserListActivity";
+
     private static final int DB_USERS_LOADER = 0;
+    private static final int DB_USERS_SAVE_STATE_LOADER = 1;
 
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
@@ -47,7 +52,7 @@ public class UserListActivity extends BaseActivity implements LoaderManager.Load
 
     private RecyclerView mRecyclerView;
     private UsersAdapter mUsersAdapter;
-    private List<User> mUsers;
+    private static List<User> mUsers;
 
     private CardView mSuggestsView;
     private RecyclerView mSuggestsRecyclerView;
@@ -67,6 +72,55 @@ public class UserListActivity extends BaseActivity implements LoaderManager.Load
         public List<User> loadInBackground() {
             return DataManager.getInstance().getUserListFromDb();
         }
+    }
+
+    /**
+     * Loader для асинхронного сохранения состояния списка пользователей в БД
+     */
+    private static class DbUsersSaveStateLoader extends AsyncTaskLoader<Object> {
+
+        public DbUsersSaveStateLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        public Object loadInBackground() {
+            saveUserListStateToDb();
+            return null;
+        }
+    }
+
+    /**
+     * Вспомогательный класс для реализации удаления (свайпом) и перетаскивания
+     * элементов списка пользователей
+     */
+    private class UserItemTouchHelper extends ItemTouchHelper.SimpleCallback {
+
+        private UsersAdapter mUsersAdapter;
+
+        public UserItemTouchHelper(UsersAdapter usersAdapter) {
+            super(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+                    ItemTouchHelper.START | ItemTouchHelper.END);
+            this.mUsersAdapter = usersAdapter;
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                              RecyclerView.ViewHolder target) {
+            int itemPos = viewHolder.getAdapterPosition();
+            int targetPos = target.getAdapterPosition();
+            mUsersAdapter.swap(itemPos, targetPos);
+            updateSuggests();
+            return true;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            int position = viewHolder.getAdapterPosition();
+            mUsersAdapter.remove(position);
+            updateSuggests();
+        }
+
     }
 
 
@@ -89,6 +143,14 @@ public class UserListActivity extends BaseActivity implements LoaderManager.Load
         setupDrawer();
 
         getSupportLoaderManager().initLoader(DB_USERS_LOADER, null, this).forceLoad();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mUsers = mUsersAdapter.getUsers();
+
+        getSupportLoaderManager().initLoader(DB_USERS_SAVE_STATE_LOADER, null, this).forceLoad();
     }
 
     @Override
@@ -142,6 +204,8 @@ public class UserListActivity extends BaseActivity implements LoaderManager.Load
         switch (id) {
             case DB_USERS_LOADER:
                 return new DbUsersLoader(this);
+            case DB_USERS_SAVE_STATE_LOADER:
+                return new DbUsersSaveStateLoader(this);
             default:
                 return null;
         }
@@ -190,7 +254,7 @@ public class UserListActivity extends BaseActivity implements LoaderManager.Load
     }
 
     /**
-     * Выполняет инициализацию списка пользователей
+     * Выполняет инициализацию списка пользователей в RecyclerView
      */
     private void setupUserList() {
         mUsersAdapter = new UsersAdapter(mUsers, new UsersAdapter.UserViewHolder.CustomClickListener() {
@@ -203,8 +267,11 @@ public class UserListActivity extends BaseActivity implements LoaderManager.Load
                 startActivity(profileIntent);
             }
         });
-
         mRecyclerView.setAdapter(mUsersAdapter);
+
+        ItemTouchHelper itemTouchHelper =
+                new ItemTouchHelper(new UserItemTouchHelper(mUsersAdapter));
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
     /**
@@ -229,6 +296,19 @@ public class UserListActivity extends BaseActivity implements LoaderManager.Load
         mSuggestsRecyclerView.setAdapter(mSuggestsAdapter);
     }
 
+    /**
+     * Выполняет обновление списка рекомендаций при поиске пользователя
+     */
+    private void updateSuggests() {
+        mSearchSuggests.clear();
+        List<User> allUsers = mUsersAdapter.getUsers();
+        for (int i = 0; i < allUsers.size(); i++) {
+            mSearchSuggests.add(new SuggestModel(allUsers.get(i).getFullName(), i));
+        }
+        mSuggestsAdapter.update(mSearchSuggests);
+    }
+
+
     private void setupDrawer() {
         // TODO: 14.07.2016 Реализовать переход в другую активность при клике по элементу меню в NavigationDrawer
     }
@@ -242,6 +322,22 @@ public class UserListActivity extends BaseActivity implements LoaderManager.Load
             actionBar.setDisplayHomeAsUpEnabled(true);
 
         }
+    }
+
+    /**
+     * Сохраняет состояние списка пользователей в БД
+     */
+    private static void saveUserListStateToDb() {
+        List<User> allUsers = new ArrayList<>();
+        allUsers.addAll(mUsers);
+
+        for (int i = 0; i < allUsers.size(); i++) {
+            allUsers.get(i).setPosition(i);
+        }
+
+        DataManager dataManager = DataManager.getInstance();
+        dataManager.getDaoSession().getUserDao().deleteAll();
+        dataManager.getDaoSession().getUserDao().insertOrReplaceInTx(allUsers);
     }
 
 }

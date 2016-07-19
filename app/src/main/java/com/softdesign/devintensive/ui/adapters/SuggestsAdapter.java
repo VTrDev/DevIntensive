@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.softdesign.devintensive.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SuggestsAdapter extends RecyclerView.Adapter<SuggestsAdapter.SuggestViewHolder> {
@@ -62,6 +63,13 @@ public class SuggestsAdapter extends RecyclerView.Adapter<SuggestsAdapter.Sugges
             mSuggestList.clear();
             mSuggestList.addAll(filterResult);
         }
+        notifyDataSetChanged();
+    }
+
+    public void update(List<SuggestModel> suggestList) {
+        mSuggestList = suggestList;
+        mSuggestListCopy = new ArrayList<>();
+        mSuggestListCopy.addAll(mSuggestList);
         notifyDataSetChanged();
     }
 

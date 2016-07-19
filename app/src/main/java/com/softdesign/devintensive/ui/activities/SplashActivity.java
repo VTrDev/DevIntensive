@@ -54,14 +54,16 @@ public class SplashActivity extends BaseActivity implements LoaderManager.Loader
             List<Repository> allRepositories = new ArrayList<>();
             List<User> allUsers = new ArrayList<>();
 
-            for (UserListRes.UserData userRes : mUserDataList) {
-                allRepositories.addAll(getRepoListFromUserRes(userRes));
-                allUsers.add(new User(userRes));
+            for (int i = 0; i < mUserDataList.size(); i++) {
+                allRepositories.addAll(getRepoListFromUserRes(mUserDataList.get(i)));
+                allUsers.add(new User(mUserDataList.get(i), i));
             }
 
-            DataManager.getInstance().getDaoSession()
+            DataManager dataManager = DataManager.getInstance();
+
+            dataManager.getDaoSession()
                     .getRepositoryDao().insertOrReplaceInTx(allRepositories);
-            DataManager.getInstance().getDaoSession()
+            dataManager.getDaoSession()
                     .getUserDao().insertOrReplaceInTx(allUsers);
 
             return null;
@@ -143,8 +145,8 @@ public class SplashActivity extends BaseActivity implements LoaderManager.Loader
         if (authToken.isEmpty() || authToken.equals("null")) {
             startActivity(new Intent(SplashActivity.this, AuthActivity.class));
         } else {
-            startActivity(new Intent(SplashActivity.this, AuthActivity.class));
-            //startActivity(new Intent(SplashActivity.this, UserListActivity.class));
+            //startActivity(new Intent(SplashActivity.this, AuthActivity.class));
+            startActivity(new Intent(SplashActivity.this, UserListActivity.class));
             //startActivity(new Intent(SplashActivity.this, MainActivity.class));
         }
     }
