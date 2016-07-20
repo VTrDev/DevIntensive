@@ -13,7 +13,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -142,7 +141,6 @@ public class UserListActivity extends BaseActivity implements LoaderManager.Load
         mNavigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
 
-        //mSuggestsView = (CardView) findViewById(R.id.search_card);
         mSearchLayout = (LinearLayout) findViewById(R.id.search_layout);
         mRecyclerView = (RecyclerView) findViewById(R.id.user_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -277,7 +275,6 @@ public class UserListActivity extends BaseActivity implements LoaderManager.Load
      */
     private void showSuggestList() {
         if (mSearchLayout.getVisibility() == View.GONE) {
-            mRecyclerView.setVisibility(View.GONE);
             mSearchLayout.setVisibility(View.VISIBLE);
             mRecyclerView.setLayoutFrozen(true);
         }
@@ -287,7 +284,6 @@ public class UserListActivity extends BaseActivity implements LoaderManager.Load
      * Скрывает список рекомендаций при поиске
      */
     private void hideSuggestList() {
-        mRecyclerView.setVisibility(View.VISIBLE);
         mSearchLayout.setVisibility(View.GONE);
         mRecyclerView.setLayoutFrozen(false);
     }
