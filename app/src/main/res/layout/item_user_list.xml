@@ -21,7 +21,7 @@
                 android:id="@+id/user_photo_img"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/userphoto"
+                android:src="@drawable/user_bg"
                 android:scaleType="centerCrop"
                 app:aspect_ratio="1.78"/>
 

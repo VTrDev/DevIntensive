@@ -64,8 +64,6 @@ public class AuthActivity extends BaseActivity implements  View.OnClickListener 
     @Override
     protected void onResume() {
         super.onResume();
-        mLogin.setText("trusov.public@gmail.com");
-        mPassword.setText("sda1092014");
     }
 
     @Override
@@ -109,6 +107,8 @@ public class AuthActivity extends BaseActivity implements  View.OnClickListener 
         saveUserValues(userModel);
         saveUserData(userModel);
         saveUserFullName(userModel);
+        saveUserPhotoUrl(userModel);
+        saveUserAvatarUrl(userModel);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -139,9 +139,9 @@ public class AuthActivity extends BaseActivity implements  View.OnClickListener 
                 @Override
                 public void onResponse(Call<UserModelRes> call, Response<UserModelRes> response) {
                     if (response.code() == 200) {
+                        hideProgress();
                         loginSuccess(response.body());
                         mDataManager.getPreferencesManager().saveUserLogin(login);
-                        hideProgress();
                     } else if (response.code() == 404) {
                         hideProgress();
                         showSnackbar(getString(R.string.auth_invalid_credentials));
@@ -210,7 +210,24 @@ public class AuthActivity extends BaseActivity implements  View.OnClickListener 
         mDataManager.getPreferencesManager().saveUserFullName(userNames);
     }
 
+    /**
+     * Извлекает URL фотографии пользователя из модели {@link UserModelRes}
+     * и сохраняет его в Shared Preferences
+     * @param userModel модель данных пользователя
+     */
+    private void saveUserPhotoUrl(UserModelRes userModel) {
+        mDataManager.getPreferencesManager().saveUserPhotoUrl(
+                userModel.getData().getUser().getPublicInfo().getPhoto());
+    }
 
-
+    /**
+     * Извлекает URL аватара пользователя из модели {@link UserModelRes}
+     * и сохраняет его в Shared Preferences
+     * @param userModel модель данных пользователя
+     */
+    private void saveUserAvatarUrl(UserModelRes userModel) {
+        mDataManager.getPreferencesManager().saveUserAvatarUrl(
+                userModel.getData().getUser().getPublicInfo().getAvatar());
+    }
 
 }

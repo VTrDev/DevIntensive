@@ -145,9 +145,7 @@ public class SplashActivity extends BaseActivity implements LoaderManager.Loader
         if (authToken.isEmpty() || authToken.equals("null")) {
             startActivity(new Intent(SplashActivity.this, AuthActivity.class));
         } else {
-            //startActivity(new Intent(SplashActivity.this, AuthActivity.class));
-            startActivity(new Intent(SplashActivity.this, UserListActivity.class));
-            //startActivity(new Intent(SplashActivity.this, MainActivity.class));
+            startActivity(new Intent(SplashActivity.this, MainActivity.class));
         }
     }
 
@@ -159,7 +157,7 @@ public class SplashActivity extends BaseActivity implements LoaderManager.Loader
     @Subscribe
     public void onSavedUserListData(DataSavedEvent event) {
         if (event.isSuccessful) {
-            startActivity(new Intent(SplashActivity.this, UserListActivity.class));;
+            startActivity(new Intent(SplashActivity.this, MainActivity.class));;
         }
     }
 

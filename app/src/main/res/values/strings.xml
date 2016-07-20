@@ -18,7 +18,7 @@
     <string name="user_profile.dialog.cancel">Отмена</string>
     <string name="user_profile.dialog.title">Изменить фотографию профиля</string>
     <string name="user_profile.chose.message">выберите фото</string>
-    <string name="user_profile.empty_bio">Этот пользователь пока о себе ничего не написал...</string>
+    <string name="user_profile.empty_bio">Этот пользователь пока о себе ничего не написал…</string>
     <string name="validation.msg.phone">Введите номер телефона в формате\n +x xxx xxx-xx-xx (от 11 до 20 цифр)</string>
     <string name="validation.msg.email">Недопустимый адрес электронной почты</string>
     <string name="validation.msg.vk">Адрес аккаунта VK должен иметь формат vk.com/ххх</string>
@@ -28,6 +28,10 @@
     <string name="chooser_title.send_mail">Отправить письмо</string>
     <string name="snackbar_msg.permissions_request">Для корректной работы приложения необходимо дать требуемые разрешения</string>
     <string name="action.allow_permissions">Разрешить</string>
+    <string name="snackbar_msg.file_creating_error">Невозможно создать файл</string>
+    <string name="snackbar_msg.permission_camera_granted">Разрешение на использование камеры получено</string>
+    <string name="snackbar_msg.permission_storage_granted">Разрешение на использование внешнего хранилища получено</string>
+    <string name="snackbar_msg.photo_upload_error">Не удалось загрузить фотографию на сервер</string>
 
     <string name="user_profile.dummy.rating">15</string>
     <string name="user_profile.dummy.codelines">50000</string>
@@ -38,12 +42,30 @@
     <string name="user_profile.dummy.github">github.com/vtr-dev/DevIntensive</string>
     <string name="user_profile.dummy.bio">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
 
+    <!-- SplashActivity -->
+    <string name="msg.user_list_getting_error">Список пользователей не может быть получен</string>
+
     <!-- AuthActivity -->
     <string name="auth.authorization_enter">Войти</string>
     <string name="auth.email">Введите E-mail</string>
     <string name="auth.password">Введите пароль</string>
     <string name="auth.login">Войти</string>
     <string name="auth.remember">Забыли пароль?</string>
+    <string name="auth.invalid_credentials">Неверный логин или пароль</string>
 
+    <!-- Drawer Menu -->
+    <string name="drawer_action_profile">Мой профиль</string>
+    <string name="drawer_action_team">Команда</string>
+    <string name="drawer_action_exit">Выйти</string>
+
+    <!-- UserListActivity -->
+    <string name="menu_action.user_search">Поиск пользователя</string>
+    <string name="search_hint.input_username">Введите имя пользователя</string>
+    <string name="user_list.load_error">Список пользователей не может быть загружен</string>
+
+    <!-- Messages -->
+    <string name="msg.smth_went_wrong">Что-то пошло не так…</string>
+    <string name="msg.network_error">Ошибка сети</string>
+    <string name="msg.network_isnt_available">Сеть на данный момент недоступна, попробуйте позже</string>
 
 </resources>
