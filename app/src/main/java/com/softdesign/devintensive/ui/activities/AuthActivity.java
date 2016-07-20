@@ -139,9 +139,9 @@ public class AuthActivity extends BaseActivity implements  View.OnClickListener 
                 @Override
                 public void onResponse(Call<UserModelRes> call, Response<UserModelRes> response) {
                     if (response.code() == 200) {
-                        hideProgress();
                         loginSuccess(response.body());
                         mDataManager.getPreferencesManager().saveUserLogin(login);
+                        hideProgress();
                     } else if (response.code() == 404) {
                         hideProgress();
                         showSnackbar(getString(R.string.auth_invalid_credentials));
