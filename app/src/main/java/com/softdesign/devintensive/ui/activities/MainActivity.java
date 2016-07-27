@@ -7,8 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,13 +40,14 @@ import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.network.res.UploadPhotoRes;
+import com.softdesign.devintensive.utils.CircleTransform;
 import com.softdesign.devintensive.utils.ConstantManager;
-import com.softdesign.devintensive.utils.RoundedAvatarDrawable;
 import com.softdesign.devintensive.utils.ValidateHelper;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,6 +57,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -149,7 +151,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         if (savedInstanceState == null) {
             // активность запускается впервые
-            // setUserProfileDummyValues();
         } else {
             // активность уже создавалась
             mCurrentEditMode = savedInstanceState
@@ -176,6 +177,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
+        if (checkTokenEmpty()) {
+            startActivity(new Intent(this, AuthActivity.class));
+        }
     }
 
     @Override
@@ -223,7 +227,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 }
                 break;
             case R.id.profile_placeholder:
-                showDialog(ConstantManager.LOAD_PROFILE_PHOTO);
+                if (getPermissions()) {
+                    showDialog(ConstantManager.LOAD_PROFILE_PHOTO);
+                }
                 break;
             case R.id.call_img:
                 if (mCurrentEditMode == ConstantManager.EDIT_MODE_OFF) {
@@ -292,41 +298,47 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * Загружает фотографию с сервера. В случае неудачи использует локальное изображение.
      */
     private void initProfileImage() {
-        String photoURL = getIntent().getStringExtra(ConstantManager.USER_PHOTO_URL_KEY);
-        final Uri photoLocalUri = mDataManager.getPreferencesManager().loadUserPhoto();
 
-        Picasso.with(MainActivity.this)
-                .load(photoLocalUri)
-                .placeholder(R.drawable.user_bg)
-                .into(mProfileImage);
+        final String userPhotoUrl = mDataManager.getPreferencesManager().loadUserPhotoUrl();
+        final int dummyPhotoId = R.drawable.user_bg;
 
-        Call<ResponseBody> call = mDataManager.getImage(photoURL);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
-                    if (bitmap != null) {
-                        mProfileImage.setImageBitmap(bitmap);
-                        try {
-                            File file = createImageFileFromBitmap("user_photo", bitmap);
-                            if (file != null) {
-                                mDataManager.getPreferencesManager()
-                                        .saveUserPhoto(Uri.fromFile(file));
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
+        // пытаемся загрузить фотографию из сети
+        DataManager.getInstance().getPicasso()
+                .load(userPhotoUrl)
+                .error(dummyPhotoId)
+                .placeholder(dummyPhotoId)
+                .fit()
+                .centerCrop()
+                .into(mProfileImage, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, " User photo loaded from network");
                     }
-                }
-            }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                showShackbar("Не удалось загрузить фотографию пользователя");
-            }
-        });
+                    @Override
+                    public void onError() {
+                        // пытаемся загрузить фотографию из кеша
+                        DataManager.getInstance().getPicasso()
+                                .load(userPhotoUrl)
+                                .error(dummyPhotoId)
+                                .placeholder(dummyPhotoId)
+                                .fit()
+                                .centerCrop()
+                                .transform(new CircleTransform())
+                                .networkPolicy(NetworkPolicy.OFFLINE)
+                                .into(mProfileImage, new com.squareup.picasso.Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Log.d(TAG, " User photo loaded from cash");
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        Log.d(TAG, " Could not fetch user photo");
+                                    }
+                                });
+                    }
+                });
     }
 
 
@@ -335,18 +347,28 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * @param photoFile представление файла фотографии
      */
     private void uploadPhoto(File photoFile) {
-        Call<ResponseBody> call = mDataManager.uploadPhoto(
-                mDataManager.getPreferencesManager().getUserId(), photoFile);
-        call.enqueue(new Callback<ResponseBody>() {
+
+        RequestBody requestBody =
+                RequestBody.create(MediaType.parse("multipart/form-data"), photoFile);
+        MultipartBody.Part bodyPart =
+                MultipartBody.Part.createFormData("photo", photoFile.getName(), requestBody);
+
+        Call<UploadPhotoRes> call = mDataManager.uploadPhoto(
+                mDataManager.getPreferencesManager().getUserId(), bodyPart);
+        call.enqueue(new Callback<UploadPhotoRes>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.d("TAG", "Upload success");
+            public void onResponse(Call<UploadPhotoRes> call, Response<UploadPhotoRes> response) {
+                if (response.body().isSuccess()) {
+                    Log.d("TAG", "Upload success");
+                } else {
+                    showShackbar(getString(R.string.snackbar_msg_photo_upload_error));
+                }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                showShackbar("Не удалось загрузить фотографию на сервер");
-                //Log.e("Upload error", t.getMessage());
+            public void onFailure(Call<UploadPhotoRes> call, Throwable t) {
+                showShackbar(getString(R.string.snackbar_msg_photo_upload_error));
+                Log.e("Upload error", t.getMessage());
             }
         });
     }
@@ -359,11 +381,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             View headerView = mNavigationView.getHeaderView(0);
 
-            List<String> userNames = mDataManager.getPreferencesManager().loadUserName();
+            List<String> userNames = mDataManager.getPreferencesManager().loadUserFullName();
             ((TextView)headerView.findViewById(R.id.user_name_txt))
                     .setText(String.format("%s %s", userNames.get(1), userNames.get(0)));
             ((TextView)headerView.findViewById(R.id.user_email_txt))
-                    .setText(mUserMail.getText());
+                    .setText(mDataManager.getPreferencesManager().getUserLogin());
 
             updateAvatar();
 
@@ -371,9 +393,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     new NavigationView.OnNavigationItemSelectedListener() {
                         @Override
                         public boolean onNavigationItemSelected(MenuItem item) {
-                            showShackbar(item.getTitle().toString());
-                            item.setChecked(true);
                             mNavigationDrawer.closeDrawer(GravityCompat.START);
+                            switch (item.getItemId()) {
+                                case R.id.team_menu:
+                                    startActivity(new Intent(MainActivity.this, UserListActivity.class));
+                                    return true;
+                                case R.id.exit_menu:
+                                    logout();
+                                    return true;
+                            }
                             return false;
                         }
                     });
@@ -381,58 +409,56 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     /**
-     * Изменяет аватар пользователя на выдвижной панеле
-     * Загружает аватар с сервера. В случае неудачи использует локальное изображение.
+     * Устанавливает аватар пользователя на выдвижной панеле.
+     * Загружает аватар с сервера. В случае неудачи использует изображение из кэша.
+     * Для отображения аватара используется скругление.
      */
     public void updateAvatar() {
 
         final ImageView avatarImg = (ImageView)
                 mNavigationView.getHeaderView(0).findViewById(R.id.avatar);
 
-        String avatarUrl = getIntent().getStringExtra(ConstantManager.USER_AVATAR_URL_KEY);
-        Uri avatarLocalUri = mDataManager.getPreferencesManager().loadUserAvatar();
+        final String userAvatarUrl = mDataManager.getPreferencesManager().loadUserAvatarUrl();
+        final int dummyAvatarId = R.drawable.no_avatar;
 
-        // TODO: 12.07.2016 Разобраться с скруглением
-//        Picasso.with(this)
-//                .load(avatarLocalUri)
-//                .placeholder(R.drawable.no_avatar)
-//                .into(avatarImg);
-//
-//        RoundedAvatarDrawable avatarDrawable = new RoundedAvatarDrawable(
-//                ((BitmapDrawable)avatarImg.getDrawable()).getBitmap());
-//        avatarDrawable.setAntiAlias(true);
-//        avatarImg.setImageDrawable(avatarDrawable);
-
-        Call<ResponseBody> call = mDataManager.getImage(avatarUrl);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
-                    if (bitmap != null) {
-                        RoundedAvatarDrawable avatarDrawable = new RoundedAvatarDrawable(bitmap);
-                        avatarDrawable.setAntiAlias(true);
-                        avatarImg.setImageDrawable(avatarDrawable);
-                        try {
-                            File file = createImageFileFromBitmap("user_avatar", bitmap);
-                            if (file != null) {
-                                mDataManager.getPreferencesManager()
-                                        .saveUserAvatar(Uri.fromFile(file));
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
+        // пытаемся загрузить аватар из сети
+        DataManager.getInstance().getPicasso()
+                .load(userAvatarUrl)
+                .error(dummyAvatarId)
+                .placeholder(dummyAvatarId)
+                .fit()
+                .centerCrop()
+                .transform(new CircleTransform())
+                .into(avatarImg, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, " User avatar loaded from network");
                     }
-                }
-            }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                showShackbar("Не удалось загрузить аватар пользователя");
-            }
-        });
+                    @Override
+                    public void onError() {
+                        // пытаемся загрузить аватар из кеша
+                        DataManager.getInstance().getPicasso()
+                                .load(userAvatarUrl)
+                                .error(dummyAvatarId)
+                                .placeholder(dummyAvatarId)
+                                .fit()
+                                .centerCrop()
+                                .transform(new CircleTransform())
+                                .networkPolicy(NetworkPolicy.OFFLINE)
+                                .into(avatarImg, new com.squareup.picasso.Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Log.d(TAG, " User avatar loaded from cash");
+                                    }
 
+                                    @Override
+                                    public void onError() {
+                                        Log.d(TAG, " Could not fetch user avatar");
+                                    }
+                                });
+                    }
+                });
     }
 
 
@@ -617,27 +643,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     /**
-     * Запускает получение фотографии из камеры
+     * Обеспечивает получение разрешений на использование камеры и внешнего хранилища
+     * (для Android 6)
+     * @return true - если разрешения были ранее установлены и false - в противном случае
      */
-    private void loadPhotoFromCamera() {
+    private boolean getPermissions() {
         // проверка разрешений для Android 6
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
         {
-            Intent takeCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-            try {
-                mPhotoFile = createImageFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-                // TODO: 01.07.2016 обработать ошибку
-            }
-            if (mPhotoFile != null) {
-                takeCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mPhotoFile));
-                startActivityForResult(takeCaptureIntent, ConstantManager.REQUEST_CAMERA_PICTURE);
-            }
+            return true;
         } else {
             // запрос разрешений на использование камеры и внешнего хранилища данных
             ActivityCompat.requestPermissions(this, new String[] {
@@ -655,6 +672,27 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         }
                     }).show();
         }
+        return false;
+    }
+
+    /**
+     * Запускает получение фотографии из камеры
+     */
+    private void loadPhotoFromCamera() {
+
+        Intent takeCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        try {
+            mPhotoFile = createImageFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showShackbar(getString(R.string.snackbar_msg_file_creating_error));
+        }
+        if (mPhotoFile != null) {
+            takeCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mPhotoFile));
+            startActivityForResult(takeCaptureIntent, ConstantManager.REQUEST_CAMERA_PICTURE);
+        }
+
     }
 
     @Override
@@ -662,12 +700,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (requestCode == ConstantManager.CAMERA_REQUEST_PERMISSION_CODE
                 && grantResults.length == 2) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // TODO: 02.07.2016  тут обрабатываем разрешение (разрешение получено)
-                // например вывести сообщение или обработать какой-то логикой если нужно
+                showShackbar(getString(R.string.snackbar_msg_permission_camera_granted));
             }
             if (grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                // TODO: 02.07.2016  тут обрабатываем разрешение (разрешение получено)
-                // например вывести сообщение или обработать какой-то логикой если нужно
+                showShackbar(getString(R.string.snackbar_msg_permission_storage_granted));
             }
         }
     }
@@ -690,7 +726,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * Блокирует сворачивание Collapsing Toolbar
      */
     private void lockToolbar() {
-        mAppBarLayout.setExpanded(true, true);
+        mAppBarLayout.setExpanded(true, false);
         // сбрасывает флаги скроллинга
         mAppBarParams.setScrollFlags(0);
         mCollapsingToolbar.setLayoutParams(mAppBarParams);
@@ -738,63 +774,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             default:
                 return null;
         }
-    }
-
-
-    /**
-     * Создает файл с для хранения изображения во внешнем хранилище
-     * @param imageFileName имя файла
-     * @param bitmap растровое изображение для сохранения в файле
-     * @return представление созданного файла изображения
-     * @throws IOException
-     */
-    private File createImageFileFromBitmap(String imageFileName, Bitmap bitmap) throws IOException {
-
-        // проверка разрешений для Android 6
-        if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-
-            File storageDir = Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_PICTURES);
-            File imageFile = null;
-            try {
-                imageFile = new File(storageDir, imageFileName + ".jpg");
-
-                FileOutputStream fos = new FileOutputStream(imageFile);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fos);
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            // Android 6 ???: сохранение изображения с добавлением в галлерею
-            ContentValues values = new ContentValues();
-            values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
-            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-            values.put(MediaStore.MediaColumns.DATA, imageFile.getAbsolutePath());
-
-            this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-            return imageFile;
-        } else {
-            // запрос разрешений на использование камеры и внешнего хранилища данных
-            ActivityCompat.requestPermissions(this, new String[] {
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            }, ConstantManager.CAMERA_REQUEST_PERMISSION_CODE);
-
-            // предоставление пользователю возможности установить разрешения,
-            // если он ранее запретил их и выбрал опцию "не показывать больше"
-            Snackbar.make(mCoordinatorLayout, R.string.snackbar_msg_permissions_request, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.action_allow_permissions, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            openApplicationSettings();
-                        }
-                    }).show();
-
-            return null;
-        }
-
     }
 
     /**
@@ -903,17 +882,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void browseUrl(String url) {
         Intent browseIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browseIntent);
-    }
-
-    private void setUserProfileDummyValues() {
-        mUserValueRating.setText(getString(R.string.user_profile_dummy_rating));
-        mUserValueCodeLines.setText(getString(R.string.user_profile_dummy_codelines));
-        mUserValueProjects.setText(getString(R.string.user_profile_dummy_projects));
-        mUserPhone.setText(getString(R.string.user_profile_dummy_phone));
-        mUserMail.setText(getString(R.string.user_profile_dummy_email));
-        mUserVk.setText(getString(R.string.user_profile_dummy_vk));
-        mUserGit.setText(getString(R.string.user_profile_dummy_github));
-        mUserBio.setText(getString(R.string.user_profile_dummy_bio));
     }
 
 }

@@ -1,10 +1,16 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,7 +19,11 @@ import android.widget.TextView;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
+import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
+import com.softdesign.devintensive.data.storage.models.Repository;
+import com.softdesign.devintensive.data.storage.models.User;
+import com.softdesign.devintensive.utils.AppConfig;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
 
@@ -24,7 +34,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AuthActivity extends BaseActivity implements View.OnClickListener {
+public class AuthActivity extends BaseActivity implements  View.OnClickListener {
 
     private Button mSignIn;
     private TextView mRememberPassword;
@@ -32,6 +42,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     private CoordinatorLayout mCoordinatorLayout;
 
     private DataManager mDataManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +64,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-        mLogin.setText("trusov.public@gmail.com");
-        mPassword.setText("sd1102010");
     }
 
     @Override
@@ -69,57 +78,89 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
     private void showSnackbar(String message) {
         Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG).show();
     }
 
+    /**
+     * Открывает в браузере страницу восстановления пароля.
+     */
     private void rememberPassword() {
         Intent rememberIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("http://devintensive.softdesign-apps.ru/forgotpass"));
+                Uri.parse(AppConfig.FORGOT_PASS_URL));
         startActivity(rememberIntent);
     }
 
-    private void loginSuccess(UserModelRes userModel) {
+    /**
+     * Обрабатывает успешную аутентификацию пользователя в приложении.
+     * Сохраняет данные в Shared Preferences и БД
+     * @param userModel модель данных пользователя, полученных с сервера.
+     */
+    private void loginSuccess(final UserModelRes userModel) {
         mDataManager.getPreferencesManager().saveAuthToken(userModel.getData().getToken());
         mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUser().getId());
         saveUserValues(userModel);
         saveUserData(userModel);
-        saveUserName(userModel);
+        saveUserFullName(userModel);
+        saveUserPhotoUrl(userModel);
+        saveUserAvatarUrl(userModel);
 
-        Intent loginIntent = new Intent(this, MainActivity.class);
-        loginIntent.putExtra(ConstantManager.USER_PHOTO_URL_KEY,
-                userModel.getData().getUser().getPublicInfo().getPhoto());
-        loginIntent.putExtra(ConstantManager.USER_AVATAR_URL_KEY,
-                userModel.getData().getUser().getPublicInfo().getAvatar());
-        startActivity(loginIntent);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent loginIntent = new Intent(AuthActivity.this, SplashActivity.class);
+                loginIntent.putExtra(ConstantManager.LOGIN_COMPLETE_KEY, true);
+                startActivity(loginIntent);
+            }
+        }, AppConfig.START_DELAY);
+
+
     }
 
+    /**
+     * Выполняет аутентификацию пользователя в приложении.
+     */
     private void signIn() {
         if (NetworkStatusChecker.isNetworkAvailable(this)) {
 
+            final String login = mLogin.getText().toString();
+
             Call<UserModelRes> call = mDataManager.loginUser(
-                    new UserLoginReq(mLogin.getText().toString(), mPassword.getText().toString()));
+                    new UserLoginReq(login, mPassword.getText().toString()));
+            showProgress();
             // асинхронный вызов
             call.enqueue(new Callback<UserModelRes>() {
                 @Override
                 public void onResponse(Call<UserModelRes> call, Response<UserModelRes> response) {
                     if (response.code() == 200) {
                         loginSuccess(response.body());
+                        mDataManager.getPreferencesManager().saveUserLogin(login);
+                        hideProgress();
                     } else if (response.code() == 404) {
-                        showSnackbar("Неверный логин или пароль");
+                        hideProgress();
+                        showSnackbar(getString(R.string.auth_invalid_credentials));
                     } else {
-                        showSnackbar("Все пропало Шеф!!!");
+                        hideProgress();
+                        showSnackbar(getString(R.string.msg_smth_went_wrong));
                     }
                 }
 
                 @Override
                 public void onFailure(Call<UserModelRes> call, Throwable t) {
-                    // TODO: 10.07.2016 Обработать ошибки
+                    hideProgress();
+                    showSnackbar(getString(R.string.msg_network_error));
+                    Log.e(TAG, "Network error: " + t.getMessage());
                 }
             });
 
         } else {
-            showSnackbar("Сеть на данный момент недоступна, попробуйте позже");
+            showSnackbar(getString(R.string.msg_network_isnt_available));
         }
     }
 
@@ -160,13 +201,33 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
      * и сохраняет их в Shared Preferences
      * @param userModel модель данных пользователя
      */
-    private void saveUserName(UserModelRes userModel) {
+    private void saveUserFullName(UserModelRes userModel) {
         String[] userNames = {
                 userModel.getData().getUser().getFirstName(),
                 userModel.getData().getUser().getSecondName()
         };
 
-        mDataManager.getPreferencesManager().saveUserName(userNames);
+        mDataManager.getPreferencesManager().saveUserFullName(userNames);
+    }
+
+    /**
+     * Извлекает URL фотографии пользователя из модели {@link UserModelRes}
+     * и сохраняет его в Shared Preferences
+     * @param userModel модель данных пользователя
+     */
+    private void saveUserPhotoUrl(UserModelRes userModel) {
+        mDataManager.getPreferencesManager().saveUserPhotoUrl(
+                userModel.getData().getUser().getPublicInfo().getPhoto());
+    }
+
+    /**
+     * Извлекает URL аватара пользователя из модели {@link UserModelRes}
+     * и сохраняет его в Shared Preferences
+     * @param userModel модель данных пользователя
+     */
+    private void saveUserAvatarUrl(UserModelRes userModel) {
+        mDataManager.getPreferencesManager().saveUserAvatarUrl(
+                userModel.getData().getUser().getPublicInfo().getAvatar());
     }
 
 }

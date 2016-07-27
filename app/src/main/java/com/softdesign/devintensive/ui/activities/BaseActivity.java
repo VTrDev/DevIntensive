@@ -1,6 +1,7 @@
 package com.softdesign.devintensive.ui.activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
@@ -8,11 +9,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.softdesign.devintensive.R;
+import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.utils.ConstantManager;
 
 public class BaseActivity extends AppCompatActivity {
     public static final String TAG = ConstantManager.TAG_PREFIX + "BaseActivity";
     protected ProgressDialog mProgressDialog;
+
+    private DataManager mDataManager = DataManager.getInstance();
 
     /**
      * Отображает диалог прогресса выполнения длительных операций
@@ -36,7 +40,7 @@ public class BaseActivity extends AppCompatActivity {
     public void hideProgress() {
         if (mProgressDialog != null) {
             if (mProgressDialog.isShowing()) {
-                mProgressDialog.hide();
+                mProgressDialog.dismiss();
             }
         }
     }
@@ -59,5 +63,24 @@ public class BaseActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Реализует выход их приложения.
+     * Сбрасывает токен. Перенаправляет на активность авторизации.
+     */
+    public void logout() {
+        mDataManager.getPreferencesManager().saveAuthToken("");
+        Intent intent = new Intent(getApplicationContext(), AuthActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+    /**
+     * Проверяет, не является ли токен авторизации пустым.
+     * @return true - если токен пустой, false - в противном случае.
+     */
+    public boolean checkTokenEmpty() {
+        String authToken = mDataManager.getPreferencesManager().getAuthToken();
+        return authToken.isEmpty();
+    }
 
 }

@@ -84,22 +84,39 @@ public class PreferencesManager {
     }
 
     /**
-     * Сохраняет URI аватара пользователя в Shared Preferences
-     * @param uri URI аватара
+     * Сохраняет URL фотографии пользователя в Shared Preferences
+     * @param photoUrl URL фотографии пользователя
      */
-    public void saveUserAvatar(Uri uri) {
+    public void saveUserPhotoUrl(String photoUrl) {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(ConstantManager.USER_AVATAR_KEY, uri.toString());
+        editor.putString(ConstantManager.USER_PHOTO_URL_KEY, photoUrl);
         editor.apply();
     }
 
     /**
-     * Считывает URI аватара пользователя из Shared Preferences
-     * @return URI аватара
+     * Считывает URL фотографии пользователя из Shared Preferences
+     * @return URL фотографии пользователя
      */
-    public Uri loadUserAvatar() {
-        return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_AVATAR_KEY,
-                "android.resource://com.softdesign.devintensive/drawable/no_avatar"));
+    public String loadUserPhotoUrl() {
+        return mSharedPreferences.getString(ConstantManager.USER_PHOTO_URL_KEY, null);
+    }
+
+    /**
+     * Сохраняет URL аватара пользователя в Shared Preferences
+     * @param avatarUrl URL аватара пользователя
+     */
+    public void saveUserAvatarUrl(String avatarUrl) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.USER_AVATAR_URL_KEY, avatarUrl);
+        editor.apply();
+    }
+
+    /**
+     * Считывает URL аватара пользователя из Shared Preferences
+     * @return URL аватара пользователя
+     */
+    public String loadUserAvatarUrl() {
+        return mSharedPreferences.getString(ConstantManager.USER_AVATAR_URL_KEY, null);
     }
 
     /**
@@ -132,7 +149,7 @@ public class PreferencesManager {
      * Сохраняет имя и фамилию пользователя в Shared Preferences
      * @param userNames массив, содержащий имя и фамилию
      */
-    public void saveUserName(String[] userNames) {
+    public void saveUserFullName(String[] userNames) {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
 
         for (int i = 0; i < USER_NAMES.length; i++) {
@@ -146,12 +163,31 @@ public class PreferencesManager {
      * Считывает имя и фамилию пользователя из Shared Preferences
      * @return списочный массив, содержащий имя и фамилию
      */
-    public List<String> loadUserName() {
+    public List<String> loadUserFullName() {
         List<String> userNames = new ArrayList<>();
         userNames.add(mSharedPreferences.getString(ConstantManager.USER_FIRST_NAME, " "));
         userNames.add(mSharedPreferences.getString(ConstantManager.USER_SECOND_NAME, " "));
         return userNames;
     }
+
+    /**
+     * Сохраняет логин (E-mail) пользователя в Shared Preferences
+     * @param userLogin токен
+     */
+    public void saveUserLogin(String userLogin) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.USER_LOGIN_KEY, userLogin);
+        editor.apply();
+    }
+
+    /**
+     * Считывает логин (E-mail) пользователя из Shared Preferences
+     * @return логин (E-mail) пользователя
+     */
+    public String getUserLogin() {
+        return mSharedPreferences.getString(ConstantManager.USER_LOGIN_KEY, "null");
+    }
+
 
     /**
      * Сохраняет токен авторизации в Shared Preferences
@@ -165,7 +201,7 @@ public class PreferencesManager {
 
     /**
      * Считывает токен авторизации из Shared Preferences
-     * @return
+     * @return токен авторизации
      */
     public String getAuthToken() {
         return mSharedPreferences.getString(ConstantManager.AUTH_TOKEN_KEY, "null");
@@ -183,10 +219,9 @@ public class PreferencesManager {
 
     /**
      * Считывает идентификатор пользователя из Shared Preferences
-     * @return
+     * @return идентификатор пользователя
      */
     public String getUserId() {
         return mSharedPreferences.getString(ConstantManager.USER_ID_KEY, "null");
     }
-
 }

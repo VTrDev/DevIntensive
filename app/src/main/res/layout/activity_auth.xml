@@ -6,7 +6,6 @@
     android:id="@+id/main_coordinator_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context="com.softdesign.devintensive.ui.activities.AuthActivity"
     tools:ignore="contentDescription">
 
@@ -73,39 +72,24 @@
                     android:paddingRight="@dimen/spacing_medial_24">
 
                     <android.support.design.widget.TextInputLayout
-                        android:id="@+id/wrap_login_email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:hintTextAppearance="@style/auth_edit_text_hint">
+                        style="@style/auth_edit_text_layout">
 
                         <EditText
                             android:id="@+id/login_email_et"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@string/ff_regular"
                             android:hint="@string/auth.email"
                             android:inputType="textEmailAddress"
-                            android:textColor="@color/grey"
-                            android:textColorHint="@color/grey"
-                            android:textSize="@dimen/font_small_14"/>
+                            style="@style/auth_edit_text"/>
 
                     </android.support.design.widget.TextInputLayout>
 
                     <android.support.design.widget.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:hintTextAppearance="@style/auth_edit_text_hint">
+                        style="@style/auth_edit_text_layout">
 
                         <EditText
                             android:id="@+id/login_password_et"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@string/ff_regular"
                             android:hint="@string/auth.password"
                             android:inputType="textPassword"
-                            android:textColor="@color/grey"
-                            android:textColorHint="@color/grey"
-                            android:textSize="@dimen/font_small_14"/>
+                            style="@style/auth_edit_text"/>
 
                     </android.support.design.widget.TextInputLayout>
 

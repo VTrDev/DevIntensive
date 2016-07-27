@@ -1,8 +1,13 @@
 package com.softdesign.devintensive.data.network;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.softdesign.devintensive.data.network.interceptors.HeaderInterceptor;
 import com.softdesign.devintensive.utils.AppConfig;
+import com.softdesign.devintensive.utils.DevintensiveApplication;
 
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -28,6 +33,15 @@ public class ServiceGenerator {
         // внедряем интерсепторы в http-клиент
         httpClient.addInterceptor(new HeaderInterceptor()); // добавление заголовков (токен, id-пользователя, User Agent)
         httpClient.addInterceptor(logging); // логирование
+
+        httpClient.connectTimeout(AppConfig.MAX_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS);
+        httpClient.readTimeout(AppConfig.MAX_READ_TIMEOUT, TimeUnit.MILLISECONDS);
+
+        // подключаем кеш к http-клиенту
+        httpClient.cache(new Cache(DevintensiveApplication.getContext().getCacheDir(), Integer.MAX_VALUE));
+
+        // интерсептор для использования интсрументов отладки Stetho
+        httpClient.addNetworkInterceptor(new StethoInterceptor());
 
         Retrofit retrofit = sBuilder
                 .client(httpClient.build())
